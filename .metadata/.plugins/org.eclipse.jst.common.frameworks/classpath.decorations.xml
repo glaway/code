@@ -1,0 +1,10 @@
+<classpath>
+  <container id="functionManage!org.eclipse.jst.j2ee.internal.web.container">
+    <entry id="C:/lifei/eclipseworkspace/functionManage/WebContent/WEB-INF/lib/commons-dbcp-1.2.1.jar">
+      <source-attachment-path>C:/Users/85260/AppData/Local/Temp/.org.sf.feeling.decompiler1576029534309/source/commons-dbcp-1.2.1-sources.jar</source-attachment-path>
+    </entry>
+    <entry id="C:/lifei/eclipseworkspace/functionManage/WebContent/WEB-INF/lib/spring-test-4.0.6.RELEASE.jar">
+      <source-attachment-path>C:/Users/85260/AppData/Local/Temp/.org.sf.feeling.decompiler1576029534309/source/spring-test-4.0.6.RELEASE-sources.jar</source-attachment-path>
+    </entry>
+  </container>
+</classpath>

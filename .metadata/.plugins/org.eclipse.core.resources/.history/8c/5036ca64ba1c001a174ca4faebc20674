@@ -1,0 +1,20 @@
+package com.glaway.ids.functionManage.dao;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public class FunctionManDao {
+
+	@Autowired
+	private JdbcTemplate jdbcTemplate;
+	
+	
+	public void insertLog(String created_date,String user_name,String type,String context) {
+		String sql = "INSERT INTO FUNCTION_MANAGE_LOG (CREATED_DATE,USER_NAME,TYPE,CONTEXT) VALUES (?,?,?,?)";
+		sql = String.format(sql,created_date,user_name,type,context);
+		System.out.println("-----"+sql);
+		jdbcTemplate.update(sql);
+	}
+}

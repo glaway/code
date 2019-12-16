@@ -1,0 +1,149 @@
+package com.glaway.offline.demo.controller;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.jeecgframework.core.common.hibernate.qbc.PageList;
+import org.jeecgframework.core.common.model.json.AjaxJson;
+import org.jeecgframework.core.common.model.json.DataGridReturn;
+import org.jeecgframework.tag.core.easyui.TagUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+import java.util.Date;
+import java.util.List;
+
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.glaway.foundation.common.exception.GWException;
+import com.glaway.foundation.common.fdexception.FdException;
+import com.glaway.foundation.common.log.BaseLogFactory;
+import com.glaway.foundation.common.log.OperationLog;
+import com.glaway.foundation.common.util.I18nUtil;
+import com.glaway.foundation.common.util.RequestMapUtil;
+import com.glaway.foundation.common.vo.ConditionVO;
+import com.glaway.foundation.system.serial.SerialNumberManager;
+import com.glaway.offline.demo.entity.Project;
+import com.glaway.offline.demo.service.ProjectService;
+
+@Controller
+@RequestMapping("/ProjectController")
+public class ProjectController {
+
+	private static final OperationLog log = BaseLogFactory
+			.getOperationLog(ProjectController.class);
+
+	@Autowired
+	private ProjectService projectService;
+
+	@RequestMapping(params = "firstmenu")
+	public ModelAndView firstmenu() {
+		return new ModelAndView("com/glaway/offline/demo/firstmenu");
+	}
+
+	@RequestMapping(params = "firstinfos")
+	public void firstinfos(HttpServletRequest request,
+			HttpServletResponse response) {
+		List<ConditionVO> conditionList = RequestMapUtil
+				.getQueryCondition(request);
+		PageList pageList = this.projectService.queryInfo(conditionList);
+		Object json = JSONArray.toJSON(new DataGridReturn(Integer
+				.valueOf(pageList.getCount()), pageList.getResultList()));
+		TagUtil.ajaxResponse(response, json.toString());
+	}
+
+	@RequestMapping(params = "projectname")
+	@ResponseBody
+	public JSONArray projectname() {
+		JSONArray jsonArray = new JSONArray();
+		JSONObject jsonObject1 = new JSONObject();
+		jsonObject1.put("type_title", "第一个项目");
+		jsonObject1.put("type_value", "a");
+		JSONObject jsonObject2 = new JSONObject();
+		jsonObject2.put("type_title", "第二个项目");
+		jsonObject2.put("type_value", "b");
+		jsonArray.add(jsonObject1);
+		jsonArray.add(jsonObject2);
+		return jsonArray;
+	}
+
+	@RequestMapping(params = "projecttype")
+	@ResponseBody
+	public JSONArray projecttype() {
+		JSONArray jsonArray = new JSONArray();
+		JSONObject jsonObject1 = new JSONObject();
+		jsonObject1.put("id", "1");
+		jsonObject1.put("name", "公共");
+		JSONObject jsonObject2 = new JSONObject();
+		jsonObject2.put("id", "2");
+		jsonObject2.put("name", "私有");
+		JSONObject jsonObject3 = new JSONObject();
+		jsonObject3.put("id", "3");
+		jsonObject3.put("name", "私有1");
+		jsonObject3.put("pid", "2");
+		jsonArray.add(jsonObject1);
+		jsonArray.add(jsonObject2);
+		jsonArray.add(jsonObject3);
+		return jsonArray;
+	}
+
+	@RequestMapping(params = "addInfo")
+	public ModelAndView addInfo() {
+		return new ModelAndView("com/glaway/offline/demo/addopr");
+	}
+
+	@RequestMapping(params = { "doAdd" })
+	@ResponseBody
+	public AjaxJson doAdd(Project entity, HttpServletRequest request,
+			HttpServletResponse response) throws FdException, Exception {
+		AjaxJson j = new AjaxJson();
+		entity.setCode(SerialNumberManager.getSerialNumber("project"));
+		entity.setCreateTime(new Date());
+		this.projectService.save(entity);
+		j.setMsg("新增成功!");
+		return j;
+	}
+	
+	@RequestMapping(params = "updateInfo")
+	public ModelAndView updateInfo() {
+		return new ModelAndView("com/glaway/offline/demo/updateopr");
+	}
+	
+	@RequestMapping(params = { "doUpdate" })
+	@ResponseBody
+	public AjaxJson doUpdate(Project entity, HttpServletRequest request,
+			HttpServletResponse response) throws FdException, Exception {
+		AjaxJson j = new AjaxJson();
+		entity.setCreateTime(new Date());
+		this.projectService.update(entity);
+		j.setMsg("修改成功!");
+		return j;
+	}
+
+	@RequestMapping(params = { "doBatchDel" })
+	@ResponseBody
+	public AjaxJson doBatchDel(String ids, HttpServletRequest request) {
+		AjaxJson j = new AjaxJson();
+		String message="删除成功!";
+		try {
+			for (String id : ids.split(",")) {
+				Project project = (Project) this.projectService.getEntity(
+						Project.class, id);
+				this.projectService.delete(project);
+			}
+			log.info(message, ids, "");
+			return j;
+		} catch (Exception e) {
+			message = I18nUtil.getValue("出现异常!!!");
+			log.error(message, e, ids, "");
+			Object[] params = { message,
+					Project.class.getClass() + " oids:" + ids };
+			throw new GWException("出现异常!!!GWException", params, e);
+		} finally {
+			j.setMsg(message);
+		}
+	}
+}

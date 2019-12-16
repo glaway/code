@@ -1,0 +1,102 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@include file="/context/mytags.jsp"%>
+
+<div class="easyui-layout" id="reportlayout" fit="true">
+	<div region="center">
+		<div id="first">
+			<fd:searchform id="searchProject"
+				onClickSearchBtn="searchGrid('project')"
+				onClickResetBtn="searchResetGrid('project')">
+				<fd:inputText title="项目名称" id="nameProject" name="Project.name"
+					queryMode="like" />
+				<fd:inputText title="负责人" id="cpersonProject" name="Project.cperson"
+					queryMode="like" />
+				<fd:inputText title="项目编码" id="codeProject" name="Project.code"
+					queryMode="eq" />
+				<fd:combobox id="stateProject" title="项目状态" multiple="true"
+					prompt="全部" data="拟制中_拟制中,审批中_审批中,已发布_已发布" textField="type_title"
+					editable="false" valueField="type_value" name="Project.state"
+					queryMode="eq"></fd:combobox>
+				<fd:combobox id="typeProject" title="项目类型" multiple="true"
+					prompt="全部"
+					data="甲类仓库_甲类仓库,乙类仓库_乙类仓库,丙类仓库_丙类仓库,丁类仓库_丁类仓库,戊类仓库_戊类仓库"
+					textField="type_title" editable="false" valueField="type_value"
+					name="Project.type" queryMode="eq"></fd:combobox>
+				<fd:inputText title="创建人" id="createName" name="Project.createName"
+					queryMode="like" />
+				<fd:inputDateRange id="createTime" interval="1" title="创建时间"
+					name="Project.createTime" opened="0"></fd:inputDateRange>
+			</fd:searchform>
+			<div class="panel-header" style="width: 100%;">
+				<div class="panel-title" style="">详情</div>
+				<div class="panel-tool">
+					<a style="width: 25px; cursor: pointer"
+						onclick="noticeClickButton()" class="panel-tool-a">更多</a>
+				</div>
+			</div>
+			<fd:toolbar id="helpToolbarId">
+				<fd:linkbutton value="新增" iconCls="basis ui-icon-plus"
+					onclick="addInfo()" />
+				<%-- <fd:linkbutton value="修改" iconCls="basis ui-icon-plus"
+					onclick="updateInfo()" /> --%>
+				<fd:linkbutton value="删除" iconCls="basis ui-icon-minus"
+					onclick="deleteALLSelect('批量删除','ProjectController.do?doBatchDel','project')" />
+			</fd:toolbar>
+		</div>
+		<fd:datagrid idField="id" id="project" fitColumns="true"
+			toolbar="first" fit="true" sortOrder="true" checked="true"
+			checkbox="true" url="ProjectController.do?firstinfos"
+			pagination="true" searchFormId="#searchProject">
+			<fd:colOpt title="">
+				<fd:colOptBtn iconCls="basis ui-icon-pencil" onClick=""></fd:colOptBtn>
+				<fd:colOptBtn iconCls="basis ui-icon-minus" onClick="" ></fd:colOptBtn>
+				<fd:colOptBtn iconCls="basis ui-icon-eye"   onClick=""></fd:colOptBtn>
+			</fd:colOpt>
+			<fd:dgCol title="项目名称" field="name"></fd:dgCol>
+			<fd:dgCol title="负责人" field="cperson"></fd:dgCol>
+			<fd:dgCol title="项目编码" field="code"></fd:dgCol>
+			<fd:dgCol title="项目状态" field="state"></fd:dgCol>
+			<fd:dgCol title="项目类型" field="type"></fd:dgCol>
+			<fd:dgCol title="创建人" field="createName"></fd:dgCol>
+			<fd:dgCol title="创建时间" field="createTime"
+				formatterFunName="datagridTimeCol"></fd:dgCol>
+			<fd:dgCol title="备注信息" field="remark"></fd:dgCol>
+		</fd:datagrid>
+		<fd:dialog id="infoAdd" title="新增" width="600" height="250"
+			modal="true">
+			<fd:dialogbutton name="确认" id="Add_submitBtn" callback="addCallBack"></fd:dialogbutton>
+			<fd:dialogbutton name="取消" id="Add_closeBtn" callback="hideDialog"></fd:dialogbutton>
+		</fd:dialog>
+		<fd:dialog id="infoUpdate" title="修改" width="600" height="250"
+			modal="true">
+			<fd:dialogbutton name="确认" id="Update_submitBtn"
+				callback="updateCallBack"></fd:dialogbutton>
+			<fd:dialogbutton name="取消" id="Update_closeBtn" callback="hideDialog"></fd:dialogbutton>
+		</fd:dialog>
+	</div>
+</div>
+
+<script type="text/javascript">
+	function noticeClickButton() {
+		tabTitle = '详情';
+		var url = 'ProjectController.do?firstmenu';
+		top.addTab(tabTitle, url, 'pictures');
+	}
+	function addInfo() {
+		var url = 'ProjectController.do?addInfo';
+		$("#infoAdd").lhgdialog("open", "url:" + url);
+	}
+	function addCallBack(iframe) {
+		iframe.addInfoClild();
+		return false;
+	}
+	function updateInfo() {
+		var url = 'ProjectController.do?updateInfo';
+		$("#infoUpdate").lhgdialog("open", "url:" + url);
+	}
+	function updateCallBack(iframe) {
+		iframe.uodateInfoClild();
+		return false;
+	}
+</script>

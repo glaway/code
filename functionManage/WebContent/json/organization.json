@@ -1,0 +1,21 @@
+[{    
+    "id":1,    
+    "text":"Design",    
+    "selected":true   
+},{    
+    "id":2,    
+    "text":"Maintenance"   
+},{    
+    "id":3,    
+    "text":"Manufacturing"   
+},{    
+    "id":4,    
+    "text":"Marketing"   
+},{    
+    "id":5,    
+    "text":"MANUF"   
+}
+,{    
+    "id":6,    
+    "text":"GLAWAY"   
+}] 

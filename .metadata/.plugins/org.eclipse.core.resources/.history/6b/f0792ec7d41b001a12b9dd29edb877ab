@@ -1,0 +1,5 @@
+package com.glaway.ids.functionManage.config;
+
+public class RootConfig {
+
+}

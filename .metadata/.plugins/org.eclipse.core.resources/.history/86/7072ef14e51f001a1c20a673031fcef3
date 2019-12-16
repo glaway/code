@@ -1,0 +1,233 @@
+/** 
+ * Created on 2016-6-18 ����9:50:48
+ * Created by cnie 
+ */
+/** 
+ * Created on 2016-6-19 ����3:43:04
+ * Created by cnie 
+ */
+package com.glaway.ids.functionManage.util;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+
+import com.glaway.ids.functionManage.properties.CommonProperties;
+
+/**
+ * @desription TODO
+ * @author cnie
+ * @date 2016-6-18 ����9:50:48
+ */
+public class WSCallVpmServices {
+
+	public boolean callVpmServices(String command, String param)
+			throws Exception {
+		boolean rs = false;
+		openServiceEXE(command, param);
+		rs = true;
+		return rs;
+	}
+
+	public synchronized void openServiceEXE(String command, String param)
+			throws Exception {
+
+		String str1 = CommonProperties.getStringProperty("program");
+		String str2 = CommonProperties.getStringProperty("methods");
+		String str3 = CommonProperties.getStringProperty("environment");
+		String str4 = CommonProperties.getStringProperty("direnv");
+		String textPath = CommonProperties.getStringProperty("testFilePath");
+		String fileName = "";
+		String textName = System.currentTimeMillis() + "";
+		fileName = textPath + textName + ".sh";
+		String tempcmd = str1 + " -run \"" + str2 + " " + command + " " + param
+				+ " \" -env " + str3 + " -direnv \"" + str4 + "\"";
+		String cmd = "su - ev5adm -c '" + tempcmd + "'";
+		writeText(fileName, cmd);
+		System.out.println(cmd);
+		Runtime rn = Runtime.getRuntime();
+		String str = "chmod 777 " + fileName;
+		Process process = rn.exec(str);
+		Thread.sleep(1000 * 1);
+		Process process2 = rn.exec(fileName);
+		/*
+		 * while (!new File(fileName).exists()) { Thread.sleep(1000 * 3); }
+		 */
+		new RunThread(process2.getInputStream(), "INFO").start();
+		new RunThread(process2.getErrorStream(), "ERR").start();
+		int value = process2.waitFor();
+		if (value == 0)
+			System.out.println("complete");
+		else
+			System.out.println("failuer");
+	}
+
+	public void createUserAndPwd(String userId, String user_level) {
+		String textPath = CommonProperties.getStringProperty("userAndPwdPath");// 模拟数据库文件路径
+		String fileName = "";
+		String textName = "userAndPwdFile";
+		fileName = textPath + textName;
+		String text = userId + " 123456 " + user_level;
+		FileWriter fw = null;
+		try {
+			File file = new File(fileName);
+			if (!file.exists()) {
+				file.createNewFile();
+				fw = new FileWriter(file, true);
+				fw.write("\n");
+				fw.write(text);
+			} else {
+				FileModify fileModify = new FileModify();
+				if (fileModify.ifExitsUser(fileName, userId)) {// 如果存在
+					fileModify.write(fileName,
+							fileModify.readLevel(fileName, userId, user_level)); // 读取修改用户等级
+				} else {
+					fw = new FileWriter(file, true);// 如果不存在就写
+					fw.write("\n");
+					fw.write(text);
+				}
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (fw != null)
+				try {
+					fw.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+		}
+	}
+
+	public void updateUserAndPwd(String userId, String dialogPwd2) {
+		String textPath = CommonProperties.getStringProperty("userAndPwdPath");// 模拟数据库文件路径
+		String fileName = "";
+		String textName = "userAndPwdFile";
+		fileName = textPath + textName;
+		FileModify fileModify = new FileModify();
+		fileModify.write(fileName,
+				fileModify.read(fileName, userId, dialogPwd2)); // 读取修改文件
+	}
+
+	public void cancellUserAndPwd(String userId, String dialogPwd2) {
+		String textPath = CommonProperties.getStringProperty("userAndPwdPath");// 模拟数据库文件路径
+		String fileName = "";
+		String textName = "userAndPwdFile";
+		fileName = textPath + textName;
+		FileModify fileModify = new FileModify();
+		fileModify.write(fileName,
+				fileModify.cancellRad(fileName, userId, dialogPwd2)); // 读取修改文件
+	}
+
+	public void createUser(String userId) throws Exception {
+		String chpasswdTextPath = CommonProperties
+				.getStringProperty("testFilePath");
+		String chpasswdfileName = chpasswdTextPath + userId + "/"
+				+ System.currentTimeMillis() + ".txt";
+		File chpasswdfileNamefile = new File(chpasswdTextPath + userId);
+		if (!chpasswdfileNamefile.exists()) {
+			chpasswdfileNamefile.mkdirs();
+		}
+		writeText(chpasswdfileName, userId + ":" + userId + "@cac");
+		String textPath = CommonProperties.getStringProperty("testFilePath");
+		String fileName = "";
+		String textName = System.currentTimeMillis() + "";
+		fileName = textPath + textName + ".sh";// linux
+		String cmd = "useradd -d /home/" + userId + " -m " + userId;// linux
+		cmd = cmd + "\n" + "cat " + chpasswdfileName + "|chpasswd";
+		writeText(fileName, cmd);
+		Runtime rn = Runtime.getRuntime();
+		Process process = rn.exec("chmod 777 " + fileName);
+		rn.exec(textPath + "./" + textName + ".sh");
+		process.waitFor();
+		System.out.println("finish:" + process.waitFor());
+	}
+
+	public void updateUserPwd(String userId, String dialogPwd2) {
+		String chpasswdTextPath = CommonProperties
+				.getStringProperty("testFilePath");
+		String chpasswdfileName = chpasswdTextPath + userId + "/"
+				+ System.currentTimeMillis() + ".txt";
+		File chpasswdfileNamefile = new File(chpasswdTextPath + userId);
+		if (!chpasswdfileNamefile.exists()) {
+			chpasswdfileNamefile.mkdirs();
+		}
+		writeText(chpasswdfileName, userId + ":" + dialogPwd2);
+		String textPath = CommonProperties.getStringProperty("testFilePath");
+		String fileName = "";// linux
+		String textName = System.currentTimeMillis() + "";
+		fileName = textPath + textName + ".sh";
+		String cmd = "cat " + chpasswdfileName + "|chpasswd";// linux
+		writeText(fileName, cmd);
+		try {
+			Runtime rn = Runtime.getRuntime();
+			Process process = rn.exec("chmod 777 " + fileName);
+			rn.exec(textPath + "./" + textName + ".sh");
+			process.waitFor();
+			System.out.println("finish:" + process.waitFor());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public void cancellUserPwd(String userId) {
+		String textPath = CommonProperties.getStringProperty("testFilePath");
+		String fileName = "";
+		String textName = System.currentTimeMillis() + "";
+		// fileName = textPath+textName+".bat";
+		fileName = textPath + textName + ".sh";
+		// String cmd = "net  user "+ userId+" "+ dialogPwd2;//window
+		String cmd = "userdel  " + userId;// linux
+		writeText(fileName, cmd);
+		try {
+			Runtime rn = Runtime.getRuntime();
+			Process process = rn.exec("chmod 777 " + fileName);
+			rn.exec(fileName);
+			process.waitFor();
+			System.out.println("finish:" + process.waitFor());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	private void writeText(String fileName, String text) {
+		FileWriter fw = null;
+		try {
+			File file = new File(fileName);
+			boolean isFileExit = file.exists();
+			fw = new FileWriter(file, true);
+			if (isFileExit)
+				fw.write("\n");
+			fw.write(text);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (fw != null)
+				try {
+					fw.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+		}
+	}
+
+	@SuppressWarnings("unused")
+	private void removeFile(String fileName) {
+
+		try {
+			File file = new File(fileName);
+			if (file.exists()) {
+				file.delete();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+}

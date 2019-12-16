@@ -1,0 +1,8 @@
+program=/vpmcac/B18/aix_a/code/command/bin/CATSTART.exe  
+methods=VPMPeopleImport.exe
+environment=ENOVIA_V5_VPM.V5R18.B18
+direnv=/DS/CATEnv
+testFilePath=C:/Users/85260/Desktop/VPM_Vmare/VPM_webserviceCode/LogFile
+copyFilePath=E:/VPM_webserviceCode/PO/PO
+logFilePath=D:/CAC_PDM/VPM/VPM_Vmare/VPM_webserviceCode/LogFile
+userAndPwdPath=E:/VPM_webserviceCode/PO/

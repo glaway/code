@@ -1,0 +1,22 @@
+package com.glaway.ids.functionManage.test;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import com.glaway.ids.functionManage.dao.TestDao;
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = { "classpath:spring-context.xml" }) // 加载Spring配置文件
+public class test {
+
+	@Autowired
+	private TestDao testDao;
+
+	@Test
+	public void queryTest() {
+		testDao.query();
+	}
+}

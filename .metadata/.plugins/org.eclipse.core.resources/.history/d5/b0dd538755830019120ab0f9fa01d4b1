@@ -1,0 +1,49 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@include file="/context/mytags.jsp"%>
+<t:base type="jquery_iframe,easyui_iframe,tools"></t:base>
+
+<div class="easyui-layout" id="reportlayout" fit="true">
+	<div data-options="region:'center'" style="height: 147px">
+		<fd:form id="updateProject">
+			<fd:inputText title="项目名称" id="name" maxLength="-1" value=""/>
+			<fd:inputSearchUser id="selectuser" title="负责人" deptInput="hide"  deptInputVal=""   editable="false" multiple="true" ></fd:inputSearchUser>
+			<%-- <fd:inputText title="项目编码" id="code" maxLength="-1" /> --%>
+			<fd:combobox id="state" title="项目状态" multiple="true" prompt="全部" data="拟制中_拟制中,审批中_审批中,已发布_已发布"
+					textField="type_title" editable="false" valueField="type_value" name="state" queryMode="eq"></fd:combobox>
+				<fd:combobox id="type" title="项目类型" multiple="true" prompt="全部" data="甲类仓库_甲类仓库,乙类仓库_乙类仓库,丙类仓库_丙类仓库,丁类仓库_丁类仓库,戊类仓库_戊类仓库"
+					textField="type_title" editable="false" valueField="type_value" name="type" queryMode="eq"></fd:combobox>
+		<fd:inputText title="备注信息" id="remark" maxLength="-1" />
+		</fd:form>
+	</div>
+</div>
+
+<script type="text/javascript">
+	
+	function updateInfoClild() {
+		$('#updateProject').form('submit', {
+			url : 'ProjectController.do?doUpdate&isAjax=true',
+			onSubmit : function(param) {
+				var isValid = $(this).form('validate');
+				if (!isValid) {
+					$.messager.progress('close'); // 如果表单是无效的则隐藏进度条
+					return false;
+				}
+				return true; // 返回false终止表单提交
+			},
+			success : function(data) {
+				var jsonObj = $.parseJSON(data);
+				var rst = ajaxRstAct(jsonObj);
+				if (jsonObj.success) {
+					$.fn.lhgdialog("getSelectParentWin").tip(jsonObj.msg);
+					$.fn.lhgdialog("getSelectParentWin").$('#project').datagrid('reload');
+					$.fn.lhgdialog("closeSelect");
+				}
+			},
+			onLoadError : function() {
+				alert(0);
+			}
+		});
+	}
+</script>
+

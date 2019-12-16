@@ -1,0 +1,4 @@
+# JDBC配置（Oracle）
+jdbc.url=jdbc:oracle:thin:@136.6.161.200:1521:orcl
+jdbc.username=cath_thinkops
+jdbc.password=cath_thinkops#2018
