@@ -19,7 +19,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -34,23 +33,18 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-import org.springframework.web.servlet.mvc.condition.RequestConditionHolder;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.glaway.ids.functionManage.dao.FunctionManDao;
-import com.glaway.ids.functionManage.dao.TestDao;
 import com.glaway.ids.functionManage.properties.CommonProperties;
 import com.glaway.ids.functionManage.util.FunctionUtil;
 import com.glaway.ids.functionManage.util.ResponseJsonUtils;
 import com.glaway.ids.functionManage.util.WSCallVpmServices;
+
 
 @Controller
 public class FunctionManController {
@@ -63,7 +57,7 @@ public class FunctionManController {
 	 * 
 	 * public static ServletContext application;
 	 */
-
+	
 	public Map<String, String> userMap = new HashMap<String, String>();
 
 	/**
@@ -95,16 +89,6 @@ public class FunctionManController {
 		functionManDao.insertLog(getDateString(), userMap.get("userId")
 				.toString(), "退出", "退出成功");
 		return "login";
-	}
-
-	@Autowired
-	private TestDao testDao;
-
-	@RequestMapping("/test")
-	public String test(HttpServletRequest request) {
-		String aString = testDao.query();
-		System.out.println("11111" + aString);
-		return aString;
 	}
 
 	@Autowired
@@ -397,7 +381,7 @@ public class FunctionManController {
 			for (String data : datalist) {
 				Map<String, String> mapVo = new HashMap<String, String>();
 				String[] tempStringArray = data.split(";");
-				mapVo.put("project_id",
+				mapVo.put("project_name",
 						tempStringArray[0].split("\\s+")[1].toString());
 				dataMaplist.add(mapVo);
 			}
@@ -639,7 +623,9 @@ public class FunctionManController {
 		List<String> userVOList = new ArrayList<String>();
 		userVOList.add("用户创建");
 		userVOList.add("用户查询/修改");
+		userVOList.add("项目查询");
 		userVOList.add("创建项目");
+		userVOList.add("组织查询");
 		userVOList.add("创建组织");
 		// 安全管理vo
 		List<String> secuVOList = new ArrayList<String>();
@@ -699,9 +685,14 @@ public class FunctionManController {
 				viewPage = "editPwd";
 				request.setAttribute("id_userId",
 						request.getParameter("id_userId"));
+			}else if("selectProj".equals(method)){
+				viewPage = "selectProj";
 			} else if ("createProj".equals(method)) {// 3创建项目
 				viewPage = "createProj";
-			} else if ("createLogicOrga".equals(method)) {// 4创建逻辑组织
+			} else if("selectOra".equals(method)){
+				viewPage = "selectOra";
+			}
+			else if ("createLogicOrga".equals(method)) {// 4创建逻辑组织
 				viewPage = "createLogicOrga";
 			} else if ("updateUserInfo".equals(method)) {// 5、2中的修改页面跳转
 				viewPage = "updateUserInfo";
@@ -1643,6 +1634,95 @@ public class FunctionManController {
 		pw.close();
 		functionManDao.insertLog(getDateString(), userMap.get("userId")
 				.toString(), "审计查询", "查询成功");
+	}
+	
+	@RequestMapping("/selectProj")
+	@ResponseBody
+	public void selectProj(HttpServletRequest request,
+			HttpServletResponse response) throws Exception{
+		String projectName = request.getParameter("projectName");
+		List<Map<String,String>> queryuserData = new ArrayList<Map<String,String>>();
+		if(projectName==null||"".equals(projectName)){
+			queryuserData = allprojectData;
+		}else {
+			for (Map<String, String> proj : allprojectData) {
+				String project_name = proj.get("project_name");
+				if(projectName.equals(project_name)){
+					queryuserData.add(proj);
+				}
+			}
+		}
+		String pageNumber = request.getParameter("pageNumber") == null
+				|| request.getParameter("pageNumber").equals("") ? "1"
+				: request.getParameter("pageNumber");
+		String pageSize = request.getParameter("pageSize") == null
+				|| request.getParameter("pageSize").equals("") ? "10" : request
+				.getParameter("pageSize");
+		int pageSizeInt = Integer.valueOf(pageSize);
+		int pageNumberInt = Integer.valueOf(pageNumber);
+		List<Map<String, String>> queryuserPageData = new ArrayList<Map<String, String>>();// 用户分页数据
+		for (int i = (pageNumberInt - 1) * pageSizeInt; i < (pageNumberInt - 1)
+				* pageSizeInt + pageSizeInt
+				&& i < queryuserData.size(); i++) {
+			queryuserPageData.add(queryuserData.get(i));
+		}
+		String datagridStr = "{\"rows\":"
+				+ JSON.toJSONString(queryuserPageData) + ",\"total\":"
+				+ queryuserData.size() + "}";
+		response.setCharacterEncoding("UTF-8");
+		response.setHeader("Content-type", "text/html;charset=UTF-8");
+		response.setContentType("text/html;charset=UTF-8");
+		PrintWriter pw = response.getWriter();
+		pw.write(datagridStr);
+		pw.flush();
+		pw.close();
+		functionManDao.insertLog(getDateString(), userMap.get("userId")
+				.toString(), "项目查询", "查询成功");
+	}
+	
+	@RequestMapping("/selectOra")
+	@ResponseBody
+	public void selectOra(HttpServletRequest request,
+			HttpServletResponse response) throws Exception{
+		String oraName = request.getParameter("oraName");
+		String oraNumber = request.getParameter("oraNumber");
+		List<Map<String,String>> queryuserData = new ArrayList<Map<String,String>>();
+		if((oraName==null||"".equals(oraName))&&(oraNumber==null||"".equals(oraNumber))){
+			queryuserData = allorginaztionData;
+		}else {
+			for (Map<String, String> proj : allorginaztionData) {
+				String ora_id = proj.get("org_id");
+				if(ora_id.equals(oraNumber)){
+					queryuserData.add(proj);
+				}
+			}
+		}
+		String pageNumber = request.getParameter("pageNumber") == null
+				|| request.getParameter("pageNumber").equals("") ? "1"
+				: request.getParameter("pageNumber");
+		String pageSize = request.getParameter("pageSize") == null
+				|| request.getParameter("pageSize").equals("") ? "10" : request
+				.getParameter("pageSize");
+		int pageSizeInt = Integer.valueOf(pageSize);
+		int pageNumberInt = Integer.valueOf(pageNumber);
+		List<Map<String, String>> queryuserPageData = new ArrayList<Map<String, String>>();// 用户分页数据
+		for (int i = (pageNumberInt - 1) * pageSizeInt; i < (pageNumberInt - 1)
+				* pageSizeInt + pageSizeInt
+				&& i < queryuserData.size(); i++) {
+			queryuserPageData.add(queryuserData.get(i));
+		}
+		String datagridStr = "{\"rows\":"
+				+ JSON.toJSONString(queryuserPageData) + ",\"total\":"
+				+ queryuserData.size() + "}";
+		response.setCharacterEncoding("UTF-8");
+		response.setHeader("Content-type", "text/html;charset=UTF-8");
+		response.setContentType("text/html;charset=UTF-8");
+		PrintWriter pw = response.getWriter();
+		pw.write(datagridStr);
+		pw.flush();
+		pw.close();
+		functionManDao.insertLog(getDateString(), userMap.get("userId")
+				.toString(), "组织查询", "查询成功");
 	}
 
 	private Map<String, String> getMapInfo(String[] tempStringArray)

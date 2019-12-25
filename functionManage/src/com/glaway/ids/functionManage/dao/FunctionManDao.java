@@ -3,8 +3,6 @@ package com.glaway.ids.functionManage.dao;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -18,7 +16,7 @@ public class FunctionManDao {
 	private JdbcTemplate jdbcTemplate;
 	
 	
-	public void insertLog(String created_date,String user_name,String type,String context) {
+	public void insertLog(String created_date,String user_name,String type,String context){
 		String sql = "INSERT INTO FUNCTION_MANAGE_LOG (CREATED_DATE,USER_NAME,TYPE,CONTEXT) VALUES (?,?,?,?)";
 		System.out.println("-----"+sql+"-----"+created_date+","+user_name+","+type+","+context);
 		jdbcTemplate.update(sql,created_date,user_name,type,context);

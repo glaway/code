@@ -17,8 +17,14 @@ function getMethodByTitle(title) {
 		if("修改密码" == title){
 			method = "?method=editPwd";
 		}
+		if("项目查询" == title){
+			method = "?method=selectProj";
+		}
 		if("创建项目" == title){
 			method = "?method=createProj";
+		}
+		if("组织查询" == title){
+			method = "?method=selectOra";
 		}
 		if("创建组织" == title){
 			method = "?method=createLogicOrga";

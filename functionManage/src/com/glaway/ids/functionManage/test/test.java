@@ -12,13 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import com.glaway.ids.functionManage.dao.TestDao;
 
 /*@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "classpath:spring-mvc.xml.xml" }) // 加载Spring配置文件
+@ContextConfiguration(locations = { "classpath:spring-mvc.xml" }) // 加载Spring配置文件
 */public class test {
 
 	/*@Autowired
