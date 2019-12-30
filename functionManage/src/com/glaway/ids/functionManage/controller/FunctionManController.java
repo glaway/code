@@ -1,15 +1,7 @@
 package com.glaway.ids.functionManage.controller;
 
+import java.io.*;
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -22,8 +14,14 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.glaway.ids.functionManage.service.UserCenterService;
+import com.glaway.ids.functionManage.util.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.util.EntityUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFFont;
@@ -36,18 +34,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.glaway.ids.functionManage.dao.FunctionManDao;
 import com.glaway.ids.functionManage.properties.CommonProperties;
-import com.glaway.ids.functionManage.util.FunctionUtil;
-import com.glaway.ids.functionManage.util.ResponseJsonUtils;
-import com.glaway.ids.functionManage.util.WSCallVpmServices;
 
 
 @Controller
 public class FunctionManController {
+
+	@Autowired
+	private UserCenterService userCenterService;
 
 	/*
 	 * static{ ServletRequestAttributes servletRequestAttributes =
@@ -60,11 +59,11 @@ public class FunctionManController {
 	
 	public Map<String, String> userMap = new HashMap<String, String>();
 
+
 	/**
 	 * 生成日志<br>
 	 */
-	private static final Log log = LogFactory
-			.getLog(FunctionManController.class);
+	private static final Log log = LogFactory.getLog(FunctionManController.class);
 
 	public static List<Map<String, String>> alluserData = new ArrayList<Map<String, String>>();// 用户数据
 	public static List<Map<String, String>> allpermissionsData = new ArrayList<Map<String, String>>();// 权限数据
@@ -206,6 +205,14 @@ public class FunctionManController {
 		}
 	}
 
+	/**
+	 *
+	 * 获取Token信息
+	 */
+	public void findToken(){
+
+	}
+
 	@RequestMapping("/export_po")
 	@ResponseBody
 	public void export_po(HttpServletRequest request,
@@ -267,7 +274,7 @@ public class FunctionManController {
 			String tempString = null;
 			// 一次读入一行，直到读入null为文件结束
 			while ((tempString = reader.readLine()) != null) {
-				if (!"".equals(tempString) && tempString != null) {
+				if (!"".equals(tempString)) {
 					userData.put(
 							tempString.split(";")[0].trim(),
 							tempString.split(";")[1].trim() + " "
@@ -771,7 +778,7 @@ public class FunctionManController {
 			writeText(fileName, content, "import");// 创建
 			// 调用
 			WSCallVpmServices wSCallVpmServices = new WSCallVpmServices();
-			boolean success = wSCallVpmServices.callVpmServices("", fileName);
+			wSCallVpmServices.callVpmServices("", fileName);
 			wSCallVpmServices.createUser(userId);// 创建系统用户
 		} catch (Exception e) {
 			message = "创建失败";
@@ -901,9 +908,8 @@ public class FunctionManController {
 			writeText(fileName, content, "import");// 创建
 			// 调用
 			WSCallVpmServices wSCallVpmServices = new WSCallVpmServices();
-			boolean success = wSCallVpmServices.callVpmServices("", fileName);
+			wSCallVpmServices.callVpmServices("", fileName);
 			wSCallVpmServices.cancellUserPwd(userId);// 删除系统用户
-			// wSCallVpmServices.cancellUserAndPwd(userId, "");
 		} catch (Exception e) {
 			message = "注销失败";
 			e.printStackTrace();
@@ -1001,7 +1007,7 @@ public class FunctionManController {
 			writeText(fileName, content, "import");// 创建
 			// 调用
 			WSCallVpmServices wSCallVpmServices = new WSCallVpmServices();
-			boolean success = wSCallVpmServices.callVpmServices("", fileName);
+			wSCallVpmServices.callVpmServices("", fileName);
 		} catch (Exception e) {
 			message = "创建失败";
 			e.printStackTrace();
@@ -1056,7 +1062,7 @@ public class FunctionManController {
 			writeText(fileName, content, "import");// 创建
 			// 调用
 			WSCallVpmServices wSCallVpmServices = new WSCallVpmServices();
-			boolean success = wSCallVpmServices.callVpmServices("", fileName);
+			wSCallVpmServices.callVpmServices("", fileName);
 		} catch (Exception e) {
 			message = "创建失败";
 			e.printStackTrace();
@@ -1159,7 +1165,7 @@ public class FunctionManController {
 			writeText(fileName, content, "import");// 创建
 			// 调用
 			WSCallVpmServices wSCallVpmServices = new WSCallVpmServices();
-			boolean success = wSCallVpmServices.callVpmServices("", fileName);
+			wSCallVpmServices.callVpmServices("", fileName);
 			createLogFile(role + "." + organization + "." + projectNo, users,
 					delusers);// 由于VPM客户端创建日志信息不全,网页端创建日志
 		} catch (Exception e) {
@@ -2266,6 +2272,29 @@ public class FunctionManController {
 			queryuserData.add(getMapInfo(tempStringArray));
 		}
 		
+	}
+
+
+	@RequestMapping(value = "/getTokenTest", method = RequestMethod.POST)
+	@ResponseBody
+	public String getTokenTest(){
+		Map<String, String> tokenMap = new HashMap<String, String>(16);
+		tokenMap.put("token","test123");
+		String result = null;
+		try {
+			result = new String((JSONObject.toJSONString(tokenMap).getBytes("ISO-8859-1")),"utf-8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+
+
+	@RequestMapping(value = "/getOrg", method = RequestMethod.GET)
+	@ResponseBody
+	public String getOrg(){
+		userCenterService.getOrg();
+		return  "success";
 	}
 
 }

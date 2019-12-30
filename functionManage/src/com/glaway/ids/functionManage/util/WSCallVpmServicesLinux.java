@@ -79,41 +79,9 @@ public class WSCallVpmServicesLinux {
 			e.printStackTrace();
 		}
 	}
-	public void createUserAndPwd(String userId,String user_level) {
-    	String textPath = CommonProperties.getStringProperty("userAndPwdPath");//模拟数据库文件路径
-		String fileName ="";
-		String textName = "userAndPwdFile";
-		fileName = textPath+textName;
-		String text = userId+";123456;"+user_level;
-		FileWriter fw = null;
-		try{
-			File file = new File(fileName);
-			if(!file.exists()){
-				file.createNewFile(); 
-				fw = new FileWriter(file,true);
-				fw.write("\n");
-				fw.write(text); 
-			}else{
-				FileModify fileModify=new FileModify();
-				if(fileModify.ifExitsUser(fileName,userId)){//如果存在
-					fileModify.write(fileName, fileModify.readLevel(fileName,userId,user_level)); // 读取修改用户等级
-				}else{
-					fw = new FileWriter(file,true);//如果不存在就写
-					fw.write("\n");
-					fw.write(text); 
-				}
-			}
-							
-		}catch (Exception e) {
-			e.printStackTrace();
-		}finally{
-			if(fw!=null)
-				try {
-					fw.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-		}	
+	public void createUserAndPwd(String userId,String userLevel) {
+		String text = userId+";123456;" + userLevel;
+		FileUtils.addOrUpdateFile(userId, userLevel, text);
 	}
 	public void updateUserAndPwd(String userId,String dialogPwd2) {
     	String textPath = CommonProperties.getStringProperty("userAndPwdPath");//模拟数据库文件路径

@@ -118,7 +118,7 @@ public class FileModify {
                 if (line.startsWith(userId)) {  
                 	String[] tempArray=line.split("\\s+");
                     buf.append(tempArray[0].trim().toString()+" "+tempArray[1].trim().toString()+" "+level);
-                }  
+                }
                 // 如果不用修改, 则按原来的内容回写  
                 else {  
                     buf.append(line);  
@@ -204,7 +204,5 @@ public class FileModify {
                 }  
             }  
         }  
-    }  
-      
-  
+    }
 }  
