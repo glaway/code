@@ -42,7 +42,7 @@ public class WSCallVpmServices {
 		String tempcmd = str1 + " -run \"" + str2 + " " + command + " " + param
 				+ " \" -env " + str3 + " -direnv \"" + str4 + "\"";
 		String cmd = "su - ev5adm -c '" + tempcmd + "'";
-		writeText(fileName, cmd);
+		FileUtils.writeText(fileName, cmd);
 		System.out.println("---当前执行的cmd:"+cmd);
 		Runtime rn = Runtime.getRuntime();
 		String str = "chmod 777 " + fileName;
@@ -100,14 +100,14 @@ public class WSCallVpmServices {
 		if (!chpasswdfileNamefile.exists()) {
 			chpasswdfileNamefile.mkdirs();
 		}
-		writeText(chpasswdfileName, userId + ":" + userId + "@cac");
+        FileUtils.writeText(chpasswdfileName, userId + ":" + userId + "@cac");
 		String textPath = CommonProperties.getStringProperty("testFilePath");
 		String fileName = "";
 		String textName = System.currentTimeMillis() + "";
 		fileName = textPath + textName + ".sh";// linux
 		String cmd = "useradd -d /home/" + userId + " -m " + userId;// linux
 		cmd = cmd + "\n" + "cat " + chpasswdfileName + "|chpasswd";
-		writeText(fileName, cmd);
+        FileUtils.writeText(fileName, cmd);
 		Runtime rn = Runtime.getRuntime();
 		Process process = rn.exec("chmod 777 " + fileName);
 		rn.exec(textPath + "./" + textName + ".sh");
@@ -124,13 +124,13 @@ public class WSCallVpmServices {
 		if (!chpasswdfileNamefile.exists()) {
 			chpasswdfileNamefile.mkdirs();
 		}
-		writeText(chpasswdfileName, userId + ":" + dialogPwd2);
+        FileUtils.writeText(chpasswdfileName, userId + ":" + dialogPwd2);
 		String textPath = CommonProperties.getStringProperty("testFilePath");
 		String fileName = "";// linux
 		String textName = System.currentTimeMillis() + "";
 		fileName = textPath + textName + ".sh";
 		String cmd = "cat " + chpasswdfileName + "|chpasswd";// linux
-		writeText(fileName, cmd);
+        FileUtils.writeText(fileName, cmd);
 		try {
 			Runtime rn = Runtime.getRuntime();
 			Process process = rn.exec("chmod 777 " + fileName);
@@ -151,7 +151,7 @@ public class WSCallVpmServices {
 		fileName = textPath + textName + ".sh";
 		// String cmd = "net  user "+ userId+" "+ dialogPwd2;//window
 		String cmd = "userdel  " + userId;// linux
-		writeText(fileName, cmd);
+        FileUtils.writeText(fileName, cmd);
 		try {
 			Runtime rn = Runtime.getRuntime();
 			Process process = rn.exec("chmod 777 " + fileName);
@@ -164,27 +164,7 @@ public class WSCallVpmServices {
 		}
 	}
 
-	private void writeText(String fileName, String text) {
-		FileWriter fw = null;
-		try {
-			File file = new File(fileName);
-			boolean isFileExit = file.exists();
-			fw = new FileWriter(file, true);
-			if (isFileExit)
-				fw.write("\n");
-			fw.write(text);
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			if (fw != null) {
-				try {
-					fw.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-	}
+
 
 	@SuppressWarnings("unused")
 	private void removeFile(String fileName) {

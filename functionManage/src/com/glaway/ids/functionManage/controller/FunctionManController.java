@@ -85,7 +85,7 @@ public class FunctionManController {
 	@RequestMapping("/exit")
 	public String exit(HttpServletRequest request) {
 		request.getSession().invalidate();
-		functionManDao.insertLog(getDateString(), userMap.get("userId")
+		functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
 				.toString(), "退出", "退出成功");
 		return "login";
 	}
@@ -199,7 +199,7 @@ public class FunctionManController {
 			data.put("message", message);
 			data.put("level", level);
 			ResponseJsonUtils.json(response, data);
-			functionManDao.insertLog(getDateString(), id_userId, "登陆", message);
+			functionManDao.insertLog(DateUtil.getDateString(), id_userId, "登陆", message);
 			// application.setAttribute("userId", id_userId);
 			userMap.put("userId", id_userId);
 		}
@@ -252,9 +252,6 @@ public class FunctionManController {
 		ResponseJsonUtils.json(response, result);
 	}
 
-	private String getDateString() {
-		return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-	}
 
 	/**
 	 * 查询模拟数据库用户
@@ -793,7 +790,7 @@ public class FunctionManController {
 				e.printStackTrace();
 			}
 			System.out.println("-----创建用户-----");
-			functionManDao.insertLog(getDateString(), userMap.get("userId")
+			functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
 					.toString(), "用户创建", message);
 		}
 	}
@@ -822,7 +819,7 @@ public class FunctionManController {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			functionManDao.insertLog(getDateString(), userMap.get("userId")
+			functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
 					.toString(), "修改密码", message);
 		}
 	}
@@ -866,7 +863,7 @@ public class FunctionManController {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			functionManDao.insertLog(getDateString(), userMap.get("userId")
+			functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
 					.toString(), "重置密码", message);
 		}
 	}
@@ -922,7 +919,7 @@ public class FunctionManController {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			functionManDao.insertLog(getDateString(), userMap.get("userId")
+			functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
 					.toString(), "注销", message);
 		}
 	}
@@ -1020,7 +1017,7 @@ public class FunctionManController {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			functionManDao.insertLog(getDateString(), userMap.get("userId")
+			functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
 					.toString(), "创建项目", message);
 		}
 	}
@@ -1075,7 +1072,7 @@ public class FunctionManController {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			functionManDao.insertLog(getDateString(), userMap.get("userId")
+			functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
 					.toString(), "创建组织", message);
 		}
 	}
@@ -1180,7 +1177,7 @@ public class FunctionManController {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			functionManDao.insertLog(getDateString(), userMap.get("userId")
+			functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
 					.toString(), "创建上下文", message);
 		}
 	}
@@ -1337,7 +1334,7 @@ public class FunctionManController {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			functionManDao.insertLog(getDateString(), userMap.get("userId")
+			functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
 					.toString(), "添加权限", message);
 		}
 	}
@@ -1396,7 +1393,7 @@ public class FunctionManController {
 		pw.write(datagridStr);
 		pw.flush();
 		pw.close();
-		functionManDao.insertLog(getDateString(), userMap.get("userId")
+		functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
 				.toString(), "权限查询", "查询成功");
 	}
 
@@ -1470,7 +1467,7 @@ public class FunctionManController {
 		pw.write(datagridStr);
 		pw.flush();
 		pw.close();
-		functionManDao.insertLog(getDateString(), userMap.get("userId")
+		functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
 				.toString(), "用户查询", "查询成功");
 	}
 
@@ -1527,7 +1524,7 @@ public class FunctionManController {
 		pw.write(datagridStr);
 		pw.flush();
 		pw.close();
-		functionManDao.insertLog(getDateString(), userMap.get("userId")
+		functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
 				.toString(), "用户权限查询", "查询成功");
 	}
 
@@ -1638,7 +1635,7 @@ public class FunctionManController {
 		pw.write(datagridStr);
 		pw.flush();
 		pw.close();
-		functionManDao.insertLog(getDateString(), userMap.get("userId")
+		functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
 				.toString(), "审计查询", "查询成功");
 	}
 	
@@ -1682,7 +1679,7 @@ public class FunctionManController {
 		pw.write(datagridStr);
 		pw.flush();
 		pw.close();
-		functionManDao.insertLog(getDateString(), userMap.get("userId")
+		functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
 				.toString(), "项目查询", "查询成功");
 	}
 	
@@ -1727,7 +1724,7 @@ public class FunctionManController {
 		pw.write(datagridStr);
 		pw.flush();
 		pw.close();
-		functionManDao.insertLog(getDateString(), userMap.get("userId")
+		functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
 				.toString(), "组织查询", "查询成功");
 	}
 
@@ -1905,7 +1902,7 @@ public class FunctionManController {
 			OutputStream output = response.getOutputStream();
 			wb.write(output);
 			output.close();
-			functionManDao.insertLog(getDateString(), userMap.get("userId")
+			functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
 					.toString(), "用户行为审计", "导出成功");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -2037,7 +2034,7 @@ public class FunctionManController {
 			OutputStream output = response.getOutputStream();
 			wb.write(output);
 			output.close();
-			functionManDao.insertLog(getDateString(), userMap.get("userId")
+			functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
 					.toString(), "管理员行为审计", "导出成功");
 		} catch (Exception e) {
 			e.printStackTrace();

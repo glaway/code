@@ -3,19 +3,16 @@ package com.glaway.ids.functionManage.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.glaway.ids.functionManage.properties.CommonProperties;
+import com.glaway.ids.functionManage.util.DateUtil;
 import com.glaway.ids.functionManage.util.FileUtils;
 import com.glaway.ids.functionManage.util.HttpClientPoolUtil;
 import com.glaway.ids.functionManage.util.WSCallVpmServices;
-import org.apache.commons.collections.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,7 +27,6 @@ public class UserCenterService {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserCenterService.class);
 
     private static final String SUCCESS = "200";
-    private static final String FAILED = "500";
     private static final String ORGANIZATION = "orginaztion";
 
 
@@ -65,7 +61,7 @@ public class UserCenterService {
         String token = getToken();
         headerMap.put("access_token", token);
         headerMap.put("Content-type", "application/json");
-        Map<String, String> bodyMap = new HashMap<String, String>();
+        Map<String, String> bodyMap = new HashMap<String, String>(16);
         bodyMap.put("pageNo", Integer.toString(1));
         bodyMap.put("pageSize", Integer.toString(10));
         bodyMap.put("uuserKey", uuserKey);
@@ -83,29 +79,31 @@ public class UserCenterService {
                     List<Map<String, String>> orgList = (List<Map<String, String>>) orgMap.get("orgs");
                     if (!CollectionUtils.isEmpty(orgList)) {
                         String textPath = CommonProperties.getStringProperty("testFilePath");
-                        String textName = "PO_query";
-                        String fileName = textPath + textName;
-                        if (wsCallVpmServices == null) {
-                            wsCallVpmServices = new WSCallVpmServices();
-                        }
-//                        wsCallVpmServices.callVpmServices("export", fileName);
-                        File queryFile = new File(fileName);
-                        if (!queryFile.exists()) {
-                            Thread.sleep(1000 * 6);
-                        }
-
-                        List<Map<String, String>> orgDataList = queryOrgDataByType(ORGANIZATION, queryFile);
-
-                        for (Map<String, String> orgInfo : orgList) {
+                        String textName = "userUpdatePO";
+                        String fileName = textPath + textName + "_" + DateUtil.getDateString("yyyyMMddHHmmss");
+                        LOGGER.info("组织信息 ===> {}",orgList.size());
+                        StringBuilder orgLine = new StringBuilder();
+                        for (int i = 0; i < orgList.size(); i++) {
+                            Map<String,String> orgInfo = orgList.get(i);
                             //读取到的信息，写入到
                             String orgId = orgInfo.get("code");
                             String parentId = orgInfo.get("parentCode");
                             String orgName = orgInfo.get("name");
-                            LOGGER.info("组织信息 ===> *ORG {};{};$;" + orgName + ";$", orgId, parentId);
-                            for (Map<String, String> vpmOrgInfo : orgDataList) {
-                                vpmOrgInfo.put(orgId, parentId + ";;;" + orgName);
+                            orgLine.append("*ORG ").append(orgId).append(";").append(parentId).append(";$;").append(orgName).append(";$");
+                            if(i != orgList.size() - 1) {
+                                orgLine.append("\n");
+                            } else {
+                                orgLine.append("\n// -----------------------------------")
+                                        .append("\n// End of export file.")
+                                        .append("\n// -----------------------------------");
                             }
                         }
+                        FileUtils.writeText(fileName,orgLine.toString());
+                        //最后执行导入命令
+                        if (wsCallVpmServices == null) {
+                            wsCallVpmServices = new WSCallVpmServices();
+                        }
+                        wsCallVpmServices.callVpmServices("", fileName);
                     } else {
                         LOGGER.error("组织信息没有数据！");
                     }
@@ -119,14 +117,13 @@ public class UserCenterService {
         }
     }
 
-
     private List<Map<String, String>> queryOrgDataByType(String type, File file) {
         // 用户以及对于的上下文数据
         List<Map<String, String>> orgDataList = new ArrayList<Map<String, String>>();
         if (ORGANIZATION.equals(type)) {
             // 组织数据
             List<String> orgList = new ArrayList<String>();
-            Map<String, String> map = new HashMap<String, String>();
+            Map<String, String> map = new HashMap<String, String>(16);
             // type为5的话为组织查询
             map.put("type", "5");
             FileUtils.readFileByLines(file.getPath(), map, orgList);
