@@ -47,7 +47,7 @@ public class WSCallVpmServices {
 				+ " \" -env " + str3 + " -direnv \"" + str4 + "\"";
 		String cmd = "su - ev5adm -c '" + tempcmd + "'";
 		writeText(fileName, cmd);
-		System.out.println(cmd);
+		System.out.println("---当前执行的cmd:"+cmd);
 		Runtime rn = Runtime.getRuntime();
 		String str = "chmod 777 " + fileName;
 		Process process = rn.exec(str);
@@ -60,9 +60,9 @@ public class WSCallVpmServices {
 		new RunThread(process2.getErrorStream(), "ERR").start();
 		int value = process2.waitFor();
 		if (value==0) {
-			System.out.println("success");
+			System.out.println("success---");
 		}else {
-			System.out.println("fail");
+			System.out.println("fail---");
 			return;
 		}
 	}

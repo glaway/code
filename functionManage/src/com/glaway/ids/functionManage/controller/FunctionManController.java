@@ -1557,7 +1557,7 @@ public class FunctionManController {
 			if (file.isDirectory()) {
 				String[] filelist = file.list();
 				for (int i = 0; i < filelist.length; i++) {
-					File readfile = new File(filepath + "\\" + filelist[i]);
+					File readfile = new File(filepath + File.separator + filelist[i]);
 					try {
 						readFileByLines(readfile.getPath(), map, allLogFileData);// 解析日志文件夹
 					} catch (ParseException e) {
@@ -2230,7 +2230,7 @@ public class FunctionManController {
 	 */
 	// 测试： 每2分钟执行（由于P&O导出） 0 */2 * * * ?
 	@Scheduled(cron = "0 0 2 * * ?")
-	public void getAllDataByScheduled() {
+	public void getAllDataByScheduled() throws Exception{
 		System.out.println("定时任务2分钟执行----------------------");
 		// 所有数据
 		allLogFileData = new ArrayList<String>();
@@ -2242,7 +2242,7 @@ public class FunctionManController {
 		if (file.isDirectory()) {
 			String[] filelist = file.list();
 			for (int i = 0; i < filelist.length; i++) {
-				File readfile = new File(filepath + "\\" + filelist[i]);
+				File readfile = new File(filepath + File.separator + filelist[i]);
 				try {
 					readFileByLines(readfile.getPath(), map, allLogFileData);// 解析日志文件夹
 				} catch (ParseException e) {
@@ -2250,6 +2250,22 @@ public class FunctionManController {
 				}
 			}
 		}
+		List<Map<String, String>> queryuserData = new ArrayList<Map<String, String>>();// 日志查询功能
+		parmasParse(queryuserData);
+	
+	}
+	
+	
+	public void parmasParse(List<Map<String, String>> queryuserData) throws UnsupportedEncodingException {
+		for (String logFileStr1 : allLogFileData) {
+			if (logFileStr1.contains("comtent1")
+					|| logFileStr1.contains("comtent2")) {
+				continue;
+			}
+			String[] tempStringArray = logFileStr1.split("\t");
+			queryuserData.add(getMapInfo(tempStringArray));
+		}
+		
 	}
 
 }
