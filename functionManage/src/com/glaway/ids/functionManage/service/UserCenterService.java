@@ -59,6 +59,7 @@ public class UserCenterService {
         String uuserKey = CommonProperties.getStringProperty("uuserKey");
         Map<String, String> headerMap = new HashMap<String, String>(16);
         String token = getToken();
+        LOGGER.info("获取接口Token==>{}",token);
         headerMap.put("access_token", token);
         headerMap.put("Content-type", "application/json");
         Map<String, String> bodyMap = new HashMap<String, String>(16);
