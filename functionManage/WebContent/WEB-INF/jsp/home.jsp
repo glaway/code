@@ -32,6 +32,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	
 		$(function(){
 			debugger;
+			alert("登陆成功！");
 			var id_userId='${id_userId}';
 			$('a[title]').click(function(){
 				debugger;

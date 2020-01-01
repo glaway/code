@@ -4,24 +4,16 @@ import java.io.*;
 import java.io.BufferedReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.glaway.ids.functionManage.service.UserCenterService;
 import com.glaway.ids.functionManage.util.*;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.util.EntityUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFFont;
@@ -30,12 +22,12 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.glaway.ids.functionManage.dao.FunctionManDao;
@@ -44,6 +36,12 @@ import com.glaway.ids.functionManage.properties.CommonProperties;
 
 @Controller
 public class FunctionManController {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(FunctionManController.class);
+
+	private static final String FUNCTION_MANAGE = "functionManage";
+	private static final String FORWARDED = "x-forwarded-for";
+
 
 	@Autowired
 	private UserCenterService userCenterService;
@@ -106,6 +104,7 @@ public class FunctionManController {
 		String level = "";
 		String id_userId = request.getParameter("id_userId");
 		String id_password = request.getParameter("id_password");
+		String type = request.getParameter("type");
 		String status = "false";
 		try {
 			List<String> userId = new ArrayList<String>();
@@ -159,6 +158,7 @@ public class FunctionManController {
 			if (message.equals("登录成功")) {
 				request.getSession().setAttribute("id_userId", id_userId);
 				request.getSession().setAttribute("id_password", id_password);
+				request.getSession().setAttribute("type", type);
 				request.getSession().setMaxInactiveInterval(500);
 				/*
 				 * alluserData = new ArrayList<Map<String, String>>();
@@ -659,7 +659,24 @@ public class FunctionManController {
 			request.setAttribute("userVOList", editUserVOList);
 			request.setAttribute("id_userId", request.getParameter("id_userId"));
 		}
-
+		//保存userId,IP到文本中
+		String type = (String) request.getSession().getAttribute("type");
+		LOGGER.info("type => {}", type);
+		if(!FUNCTION_MANAGE.equals(type)){
+			String ip;
+			if (request.getHeader(FORWARDED) == null) {
+				ip = request.getRemoteAddr();
+			} else {
+				ip = request.getHeader(FORWARDED);
+			}
+			LOGGER.info("ip => {}", ip);
+			//写入文本
+			String textPath = CommonProperties.getStringProperty("testFilePath");
+			String date = DateUtil.getDateString("yyyyMMddHHmmss");
+			String fileName = textPath + userId + "_" + date;
+			String userContent = "*PERSON "+userId+";"+ip+";"+date+";$;$;$;$";
+			FileUtils.writeText(fileName,userContent);
+		}
 		return "home";
 	}
 
@@ -2272,18 +2289,11 @@ public class FunctionManController {
 	}
 
 
-	@RequestMapping(value = "/getTokenTest", method = RequestMethod.POST)
+	@RequestMapping(value = "/getOAUserInfo", method = RequestMethod.GET)
 	@ResponseBody
-	public String getTokenTest(){
-		Map<String, String> tokenMap = new HashMap<String, String>(16);
-		tokenMap.put("token","test123");
-		String result = null;
-		try {
-			result = new String((JSONObject.toJSONString(tokenMap).getBytes("ISO-8859-1")),"utf-8");
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-		return result;
+	public String getOAUserInfo(@RequestParam(value = "userId", required = true) String userId, @RequestParam(value = "ip", required = true) String ip){
+		LOGGER.info("userId = {}, ip = {}",userId, ip);
+		return userId + "__" + ip;
 	}
 
 

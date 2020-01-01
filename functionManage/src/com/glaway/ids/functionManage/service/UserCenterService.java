@@ -69,6 +69,7 @@ public class UserCenterService {
         String data = JSONObject.toJSONString(bodyMap);
         LOGGER.info("path url ::: {} --- 参数是: {}", path, data);
         String result = HttpClientPoolUtil.doPost(path, data, headerMap, null);
+        LOGGER.info("path url result ===> {}", result);
         Map dataMap = JSON.parseObject(result, Map.class);
         if (dataMap != null && dataMap.size() > 0) {
             Map<String, Object> orgMap = (Map<String, Object>) dataMap.get("data");
@@ -101,13 +102,17 @@ public class UserCenterService {
                         }
                         FileUtils.writeText(fileName,orgLine.toString());
                         //最后执行导入命令
+                        LOGGER.info("组织信息导入VPM系统开始...");
                         if (wsCallVpmServices == null) {
                             wsCallVpmServices = new WSCallVpmServices();
                         }
                         wsCallVpmServices.callVpmServices("", fileName);
+                        LOGGER.info("组织信息导入VPM系统完毕!");
                     } else {
                         LOGGER.error("组织信息没有数据！");
                     }
+                } else {
+                    LOGGER.info("return code  ====> {}", code);
                 }
             } catch (Exception e) {
                 LOGGER.error("callVpmServices error :::", e);
