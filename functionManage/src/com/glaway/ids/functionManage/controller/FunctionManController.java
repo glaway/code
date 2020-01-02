@@ -659,30 +659,12 @@ public class FunctionManController {
 			request.setAttribute("userVOList", editUserVOList);
 			request.setAttribute("id_userId", request.getParameter("id_userId"));
 		}
-		//保存userId,IP到文本中
-		String type = (String) request.getSession().getAttribute("type");
-		LOGGER.info("type => {}", type);
-		if(!FUNCTION_MANAGE.equals(type)){
-			String ip;
-			if (request.getHeader(FORWARDED) == null) {
-				ip = request.getRemoteAddr();
-			} else {
-				ip = request.getHeader(FORWARDED);
-			}
-			LOGGER.info("ip => {}", ip);
-			//写入文本
-			String textPath = CommonProperties.getStringProperty("testFilePath");
-			String date = DateUtil.getDateString("yyyyMMddHHmmss");
-			String fileName = textPath + userId + "_" + date;
-			String userContent = "*PERSON "+userId+";"+ip+";"+date+";$;$;$;$";
-			FileUtils.writeText(fileName,userContent);
-		}
 		return "home";
 	}
 
 	@RequestMapping("/editPwd")
 	public String editPwd(HttpServletRequest request) {
-		String id_userId = request.getParameter("id_userId");
+		String userId = request.getParameter("id_userId");
 		// 用户管理vo
 		List<String> editUserVOList = new ArrayList<String>();
 		editUserVOList.add("修改密码");
@@ -690,6 +672,21 @@ public class FunctionManController {
 		// byte[] ebyte=new BASE64Decoder().de
 		request.setAttribute("id_userId", request.getParameter("id_userId"));
 		request.setAttribute("exit", "0");
+		//保存userId,IP到文本中
+		String ip;
+		if (request.getHeader(FORWARDED) == null) {
+			ip = request.getRemoteAddr();
+		} else {
+			ip = request.getHeader(FORWARDED);
+		}
+		LOGGER.info("ip => {}", ip);
+		//写入文本
+		String textPath = CommonProperties.getStringProperty("OALoginRecordFilePath");
+		String date = DateUtil.getDateString("yyyyMMddHHmmss");
+		String fileName = textPath + userId + "_" + date;
+		String userContent = "*PERSON "+userId+";"+ip+";"+date+";$;$;$;$";
+		FileUtils.writeText(fileName,userContent);
+		request.setAttribute("type", "OA");
 		return "home";
 	}
 
@@ -2286,14 +2283,6 @@ public class FunctionManController {
 			queryuserData.add(getMapInfo(tempStringArray));
 		}
 		
-	}
-
-
-	@RequestMapping(value = "/getOAUserInfo", method = RequestMethod.GET)
-	@ResponseBody
-	public String getOAUserInfo(@RequestParam(value = "userId", required = true) String userId, @RequestParam(value = "ip", required = true) String ip){
-		LOGGER.info("userId = {}, ip = {}",userId, ip);
-		return userId + "__" + ip;
 	}
 
 

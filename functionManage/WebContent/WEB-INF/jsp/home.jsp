@@ -32,7 +32,6 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	
 		$(function(){
 			debugger;
-			alert("登陆成功！");
 			var id_userId='${id_userId}';
 			$('a[title]').click(function(){
 				debugger;
@@ -134,4 +133,13 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	</div>  
   	
   </body>
+	<script type="text/javascript">
+		$(function(){
+			debugger;
+			var type='${type}';
+			if ('OA' === type) {
+				alert("登陆成功!");
+			}
+		});
+	</script>
 </html>

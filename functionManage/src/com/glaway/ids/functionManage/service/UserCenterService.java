@@ -2,6 +2,8 @@ package com.glaway.ids.functionManage.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.glaway.ids.functionManage.common.DataType;
+import com.glaway.ids.functionManage.common.OrgType;
 import com.glaway.ids.functionManage.properties.CommonProperties;
 import com.glaway.ids.functionManage.util.DateUtil;
 import com.glaway.ids.functionManage.util.FileUtils;
@@ -28,6 +30,7 @@ public class UserCenterService {
 
     private static final String SUCCESS = "200";
     private static final String ORGANIZATION = "orginaztion";
+    private static final String TRUE = "true";
 
 
     private static WSCallVpmServices wsCallVpmServices = null;
@@ -38,15 +41,18 @@ public class UserCenterService {
 
     public String getToken() {
         LOGGER.info("获取Token,放入缓存");
-        String host = CommonProperties.getStringProperty("userHost");
+        String host = CommonProperties.getStringProperty("tokenHost");
         String path = host + CommonProperties.getStringProperty("tokenPath");
+        String accessToken = CommonProperties.getStringProperty("access_token");
+        String token = CommonProperties.getStringProperty("token");
+        String tenantId = CommonProperties.getStringProperty("tenant_id");
         Map<String, String> headerMap = new HashMap<String, String>(16);
-        headerMap.put("access_token", "d3bfc54f-600d-4d03-88e3-ef0cd4780e02");
+        headerMap.put("access_token", accessToken);
         headerMap.put("Content-type", "application/json");
         headerMap.put("charset", "utf-8");
         Map<String, String> bodyMap = new HashMap<String, String>(16);
-        bodyMap.put("token", "11b8b684-4f7d-4b93-8107-883337f3b9b5");
-        bodyMap.put("tenant_id", "uuser");
+        bodyMap.put("token", token);
+        bodyMap.put("tenant_id", tenantId);
         String data = JSONObject.toJSONString(bodyMap);
         return HttpClientPoolUtil.doPost(path, data, headerMap, null);
     }
@@ -54,22 +60,24 @@ public class UserCenterService {
     @SuppressWarnings("unchecked")
     public void getOrg() {
         LOGGER.info("获取组织信息!");
-        String host = CommonProperties.getStringProperty("userHost");
-        String path = host + CommonProperties.getStringProperty("orgPath");
+        String orgHost = CommonProperties.getStringProperty("orgHost");
+        String path = orgHost + CommonProperties.getStringProperty("orgPath");
         String uuserKey = CommonProperties.getStringProperty("uuserKey");
         Map<String, String> headerMap = new HashMap<String, String>(16);
         String token = getToken();
         LOGGER.info("获取接口Token==>{}",token);
         headerMap.put("access_token", token);
         headerMap.put("Content-type", "application/json");
-        Map<String, String> bodyMap = new HashMap<String, String>(16);
-        bodyMap.put("pageNo", Integer.toString(1));
-        bodyMap.put("pageSize", Integer.toString(10));
+        Map<String, Object> bodyMap = new HashMap<String, Object>(16);
         bodyMap.put("uuserKey", uuserKey);
+        Map<String, String> queryMap = new HashMap<String, String>(16);
+        queryMap.put("orgType", OrgType.BUSINESS.getValue().toString());
+        queryMap.put("dataType", DataType.HR.getMessage());
+        bodyMap.put("query", queryMap);
         String data = JSONObject.toJSONString(bodyMap);
-        LOGGER.info("path url ::: {} --- 参数是: {}", path, data);
+        LOGGER.info("org path url ::: {} --- 参数是: {}", path, data);
         String result = HttpClientPoolUtil.doPost(path, data, headerMap, null);
-        LOGGER.info("path url result ===> {}", result);
+        LOGGER.info("org path url result ===> {}", result);
         Map dataMap = JSON.parseObject(result, Map.class);
         if (dataMap != null && dataMap.size() > 0) {
             Map<String, Object> orgMap = (Map<String, Object>) dataMap.get("data");
@@ -106,7 +114,10 @@ public class UserCenterService {
                         if (wsCallVpmServices == null) {
                             wsCallVpmServices = new WSCallVpmServices();
                         }
-                        wsCallVpmServices.callVpmServices("", fileName);
+                        String isUploadVPM = CommonProperties.getStringProperty("isUploadVPM");
+                        if(TRUE.equals(isUploadVPM)){
+                            wsCallVpmServices.callVpmServices("", fileName);
+                        }
                         LOGGER.info("组织信息导入VPM系统完毕!");
                     } else {
                         LOGGER.error("组织信息没有数据！");
