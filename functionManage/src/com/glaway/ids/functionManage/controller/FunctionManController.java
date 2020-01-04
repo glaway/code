@@ -205,14 +205,6 @@ public class FunctionManController {
 		}
 	}
 
-	/**
-	 *
-	 * 获取Token信息
-	 */
-	public void findToken(){
-
-	}
-
 	@RequestMapping("/export_po")
 	@ResponseBody
 	public void export_po(HttpServletRequest request,
@@ -665,6 +657,9 @@ public class FunctionManController {
 	@RequestMapping("/editPwd")
 	public String editPwd(HttpServletRequest request) {
 		String userId = request.getParameter("id_userId");
+		if(StringUtils.isEmpty(userId)){
+			return "login";
+		}
 		// 用户管理vo
 		List<String> editUserVOList = new ArrayList<String>();
 		editUserVOList.add("修改密码");
@@ -2269,7 +2264,6 @@ public class FunctionManController {
 		}
 		List<Map<String, String>> queryuserData = new ArrayList<Map<String, String>>();// 日志查询功能
 		parmasParse(queryuserData);
-	
 	}
 	
 	
@@ -2292,5 +2286,4 @@ public class FunctionManController {
 		userCenterService.getOrg();
 		return  "success";
 	}
-
 }
