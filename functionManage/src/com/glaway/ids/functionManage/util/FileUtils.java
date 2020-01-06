@@ -302,4 +302,29 @@ public class FileUtils {
 				.getStringProperty("logFilePath");
 		copyDir(logFile, logFileHistory);
 	}
+	
+    public static void writeText(String fileName, String text) {
+        FileWriter fw = null;
+        try {
+            File file = new File(fileName);
+            boolean isFileExit = file.exists();
+            fw = new FileWriter(file, true);
+            if (isFileExit){
+                fw.write("\n");
+            }
+            fw.write(text);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (fw != null) {
+                try {
+                    fw.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+
 }

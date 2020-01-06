@@ -133,4 +133,13 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	</div>  
   	
   </body>
+	<script type="text/javascript">
+		$(function(){
+			debugger;
+			var type='${type}';
+			if ('OA' === type) {
+				alert("登陆成功!");
+			}
+		});
+	</script>
 </html>

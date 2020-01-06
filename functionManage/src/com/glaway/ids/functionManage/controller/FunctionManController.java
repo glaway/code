@@ -4,25 +4,16 @@ import java.io.*;
 import java.io.BufferedReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.glaway.ids.functionManage.service.UserCenterService;
 import com.glaway.ids.functionManage.util.*;
-
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.util.EntityUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFFont;
@@ -31,6 +22,8 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
@@ -38,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import org.springframework.web.bind.annotation.*;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.glaway.ids.functionManage.dao.FunctionManDao;
@@ -45,6 +39,12 @@ import com.glaway.ids.functionManage.properties.CommonProperties;
 
 @Controller
 public class FunctionManController {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(FunctionManController.class);
+
+	private static final String FUNCTION_MANAGE = "functionManage";
+	private static final String FORWARDED = "x-forwarded-for";
+
 
 	@Autowired
 	private UserCenterService userCenterService;
@@ -86,7 +86,7 @@ public class FunctionManController {
 	@RequestMapping("/exit")
 	public String exit(HttpServletRequest request) {
 		request.getSession().invalidate();
-		functionManDao.insertLog(getDateString(), userMap.get("userId")
+		functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
 				.toString(), "注销", "注销成功");
 		return "login";
 	}
@@ -107,6 +107,7 @@ public class FunctionManController {
 		String level = "";
 		String id_userId = request.getParameter("id_userId");
 		String id_password = request.getParameter("id_password");
+		String type = request.getParameter("type");
 		String status = "false";
 		try {
 			List<String> userId = new ArrayList<String>();
@@ -160,6 +161,7 @@ public class FunctionManController {
 			if (message.equals("登录成功")) {
 				request.getSession().setAttribute("id_userId", id_userId);
 				request.getSession().setAttribute("id_password", id_password);
+				request.getSession().setAttribute("type", type);
 				request.getSession().setMaxInactiveInterval(500);
 				/*
 				 * alluserData = new ArrayList<Map<String, String>>();
@@ -200,12 +202,12 @@ public class FunctionManController {
 			data.put("message", message);
 			data.put("level", level);
 			ResponseJsonUtils.json(response, data);
-			functionManDao.insertLog(getDateString(), id_userId, "登陆", message);
+			functionManDao.insertLog(DateUtil.getDateString(), id_userId, "登陆", message);
 			// application.setAttribute("userId", id_userId);
 			userMap.put("userId", id_userId);
 		}
 	}
-
+	
 	/**
 	 *
 	 * 获取Token信息
@@ -253,9 +255,6 @@ public class FunctionManController {
 		ResponseJsonUtils.json(response, result);
 	}
 
-	private String getDateString() {
-		return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-	}
 
 	/**
 	 * 查询模拟数据库用户
@@ -663,13 +662,15 @@ public class FunctionManController {
 			request.setAttribute("userVOList", editUserVOList);
 			request.setAttribute("id_userId", request.getParameter("id_userId"));
 		}
-
 		return "home";
 	}
 
 	@RequestMapping("/editPwd")
 	public String editPwd(HttpServletRequest request) {
-		String id_userId = request.getParameter("id_userId");
+		String userId = request.getParameter("id_userId");
+		if(StringUtils.isEmpty(userId)){
+			return "login";
+		}
 		// 用户管理vo
 		List<String> editUserVOList = new ArrayList<String>();
 		editUserVOList.add("修改密码");
@@ -677,6 +678,21 @@ public class FunctionManController {
 		// byte[] ebyte=new BASE64Decoder().de
 		request.setAttribute("id_userId", request.getParameter("id_userId"));
 		request.setAttribute("exit", "0");
+		//保存userId,IP到文本中
+		String ip;
+		if (request.getHeader(FORWARDED) == null) {
+			ip = request.getRemoteAddr();
+		} else {
+			ip = request.getHeader(FORWARDED);
+		}
+		LOGGER.info("ip => {}", ip);
+		//写入文本
+		String textPath = CommonProperties.getStringProperty("OALoginRecordFilePath");
+		String date = DateUtil.getDateString("yyyyMMddHHmmss");
+		String fileName = textPath + userId + "_" + date;
+		String userContent = "*PERSON "+userId+";"+ip+";"+date+";$;$;$;$";
+		FileUtils.writeText(fileName,userContent);
+		request.setAttribute("type", "OA");
 		return "home";
 	}
 
@@ -793,7 +809,7 @@ public class FunctionManController {
 				e.printStackTrace();
 			}
 			System.out.println("-----创建用户-----");
-			functionManDao.insertLog(getDateString(), userMap.get("userId")
+			functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
 					.toString(), "用户创建", message);
 		}
 	}
@@ -822,7 +838,7 @@ public class FunctionManController {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			functionManDao.insertLog(getDateString(), userMap.get("userId")
+			functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
 					.toString(), "修改密码", message);
 		}
 	}
@@ -866,7 +882,7 @@ public class FunctionManController {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			functionManDao.insertLog(getDateString(), userMap.get("userId")
+			functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
 					.toString(), "重置密码", message);
 		}
 	}
@@ -922,7 +938,7 @@ public class FunctionManController {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			functionManDao.insertLog(getDateString(), userMap.get("userId")
+			functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
 					.toString(), "注销", message);
 		}
 	}
@@ -1020,7 +1036,7 @@ public class FunctionManController {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			functionManDao.insertLog(getDateString(), userMap.get("userId")
+			functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
 					.toString(), "创建项目", message);
 		}
 	}
@@ -1075,7 +1091,7 @@ public class FunctionManController {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			functionManDao.insertLog(getDateString(), userMap.get("userId")
+			functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
 					.toString(), "创建组织", message);
 		}
 	}
@@ -1180,7 +1196,7 @@ public class FunctionManController {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			functionManDao.insertLog(getDateString(), userMap.get("userId")
+			functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
 					.toString(), "创建上下文", message);
 		}
 	}
@@ -1337,7 +1353,7 @@ public class FunctionManController {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			functionManDao.insertLog(getDateString(), userMap.get("userId")
+			functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
 					.toString(), "添加权限", message);
 		}
 	}
@@ -1396,7 +1412,7 @@ public class FunctionManController {
 		pw.write(datagridStr);
 		pw.flush();
 		pw.close();
-		functionManDao.insertLog(getDateString(), userMap.get("userId")
+		functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
 				.toString(), "权限查询", "查询成功");
 	}
 
@@ -1470,7 +1486,7 @@ public class FunctionManController {
 		pw.write(datagridStr);
 		pw.flush();
 		pw.close();
-		functionManDao.insertLog(getDateString(), userMap.get("userId")
+		functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
 				.toString(), "用户查询", "查询成功");
 	}
 
@@ -1527,11 +1543,11 @@ public class FunctionManController {
 		pw.write(datagridStr);
 		pw.flush();
 		pw.close();
-		functionManDao.insertLog(getDateString(), userMap.get("userId")
+		functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
 				.toString(), "权限查询", "查询成功");
 	}
 
-	/**
+	/*
 	 * 日志查询功能
 	 * 
 	 * @param problemManagement
@@ -1641,7 +1657,7 @@ public class FunctionManController {
 		pw.write(datagridStr);
 		pw.flush();
 		pw.close();
-		functionManDao.insertLog(getDateString(), userMap.get("userId")
+		functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
 				.toString(), "审计查询", "查询成功");
 	}
 
@@ -1685,7 +1701,7 @@ public class FunctionManController {
 		pw.write(datagridStr);
 		pw.flush();
 		pw.close();
-		functionManDao.insertLog(getDateString(), userMap.get("userId")
+		functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
 				.toString(), "项目查询", "查询成功");
 	}
 
@@ -1731,7 +1747,7 @@ public class FunctionManController {
 		pw.write(datagridStr);
 		pw.flush();
 		pw.close();
-		functionManDao.insertLog(getDateString(), userMap.get("userId")
+		functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
 				.toString(), "组织查询", "查询成功");
 	}
 
@@ -1909,7 +1925,7 @@ public class FunctionManController {
 			OutputStream output = response.getOutputStream();
 			wb.write(output);
 			output.close();
-			functionManDao.insertLog(getDateString(), userMap.get("userId")
+			functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
 					.toString(), "用户行为审计", "导出成功");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -2041,7 +2057,7 @@ public class FunctionManController {
 			OutputStream output = response.getOutputStream();
 			wb.write(output);
 			output.close();
-			functionManDao.insertLog(getDateString(), userMap.get("userId")
+			functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
 					.toString(), "管理员行为审计", "导出成功");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -2320,5 +2336,4 @@ public class FunctionManController {
 		userCenterService.getOrg();
 		return "success";
 	}
-
 }
