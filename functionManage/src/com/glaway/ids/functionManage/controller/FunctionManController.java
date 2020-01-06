@@ -40,11 +40,11 @@ import com.glaway.ids.functionManage.properties.CommonProperties;
 @Controller
 public class FunctionManController {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(FunctionManController.class);
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(FunctionManController.class);
 
 	private static final String FUNCTION_MANAGE = "functionManage";
 	private static final String FORWARDED = "x-forwarded-for";
-
 
 	@Autowired
 	private UserCenterService userCenterService;
@@ -86,8 +86,8 @@ public class FunctionManController {
 	@RequestMapping("/exit")
 	public String exit(HttpServletRequest request) {
 		request.getSession().invalidate();
-		functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
-				.toString(), "注销", "注销成功");
+		functionManDao.insertLog(DateUtil.getDateString(), userMap
+				.get("userId").toString(), "注销", "注销成功");
 		return "login";
 	}
 
@@ -202,12 +202,13 @@ public class FunctionManController {
 			data.put("message", message);
 			data.put("level", level);
 			ResponseJsonUtils.json(response, data);
-			functionManDao.insertLog(DateUtil.getDateString(), id_userId, "登陆", message);
+			functionManDao.insertLog(DateUtil.getDateString(), id_userId, "登陆",
+					message);
 			// application.setAttribute("userId", id_userId);
 			userMap.put("userId", id_userId);
 		}
 	}
-	
+
 	/**
 	 *
 	 * 获取Token信息
@@ -234,8 +235,10 @@ public class FunctionManController {
 					.getStringProperty("testFilePath");
 			String textName = "PO_query";
 			String fileName = textPath + textName;
-			/*WSCallVpmServices wSCallVpmServices = new WSCallVpmServices();
-			wSCallVpmServices.callVpmServices("-export", fileName);*/
+			/*
+			 * WSCallVpmServices wSCallVpmServices = new WSCallVpmServices();
+			 * wSCallVpmServices.callVpmServices("-export", fileName);
+			 */
 			System.out.println(fileName);
 			File queryFile = new File(fileName);
 			if (!queryFile.exists()) {
@@ -254,7 +257,6 @@ public class FunctionManController {
 		}
 		ResponseJsonUtils.json(response, result);
 	}
-
 
 	/**
 	 * 查询模拟数据库用户
@@ -668,7 +670,7 @@ public class FunctionManController {
 	@RequestMapping("/editPwd")
 	public String editPwd(HttpServletRequest request) {
 		String userId = request.getParameter("id_userId");
-		if(StringUtils.isEmpty(userId)){
+		if (StringUtils.isEmpty(userId)) {
 			return "login";
 		}
 		// 用户管理vo
@@ -678,7 +680,7 @@ public class FunctionManController {
 		// byte[] ebyte=new BASE64Decoder().de
 		request.setAttribute("id_userId", request.getParameter("id_userId"));
 		request.setAttribute("exit", "0");
-		//保存userId,IP到文本中
+		// 保存userId,IP到文本中
 		String ip;
 		if (request.getHeader(FORWARDED) == null) {
 			ip = request.getRemoteAddr();
@@ -686,12 +688,14 @@ public class FunctionManController {
 			ip = request.getHeader(FORWARDED);
 		}
 		LOGGER.info("ip => {}", ip);
-		//写入文本
-		String textPath = CommonProperties.getStringProperty("OALoginRecordFilePath");
+		// 写入文本
+		String textPath = CommonProperties
+				.getStringProperty("OALoginRecordFilePath");
 		String date = DateUtil.getDateString("yyyyMMddHHmmss");
 		String fileName = textPath + userId + "_" + date;
-		String userContent = "*PERSON "+userId+";"+ip+";"+date+";$;$;$;$";
-		FileUtils.writeText(fileName,userContent);
+		String userContent = "*PERSON " + userId + ";" + ip + ";" + date
+				+ ";$;$;$;$";
+		FileUtils.writeText(fileName, userContent);
 		request.setAttribute("type", "OA");
 		return "home";
 	}
@@ -809,8 +813,8 @@ public class FunctionManController {
 				e.printStackTrace();
 			}
 			System.out.println("-----创建用户-----");
-			functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
-					.toString(), "用户创建", message);
+			functionManDao.insertLog(DateUtil.getDateString(),
+					userMap.get("userId").toString(), "用户创建", message);
 		}
 	}
 
@@ -838,8 +842,8 @@ public class FunctionManController {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
-					.toString(), "修改密码", message);
+			functionManDao.insertLog(DateUtil.getDateString(),
+					userMap.get("userId").toString(), "修改密码", message);
 		}
 	}
 
@@ -882,8 +886,8 @@ public class FunctionManController {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
-					.toString(), "重置密码", message);
+			functionManDao.insertLog(DateUtil.getDateString(),
+					userMap.get("userId").toString(), "重置密码", message);
 		}
 	}
 
@@ -893,8 +897,8 @@ public class FunctionManController {
 			HttpServletResponse response) {
 		String j = new String();
 		String message = "注销成功";
+		String userId = request.getParameter("userId");
 		try {
-			String userId = request.getParameter("userId");
 			String temporg = "";
 			for (int i = 0; i < alluserData.size(); i++) {
 				if (alluserData.get(i).get("userId").trim()
@@ -938,8 +942,9 @@ public class FunctionManController {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
-					.toString(), "注销", message);
+			functionManDao.insertLog(DateUtil.getDateString(),
+					userMap.get("userId").toString(), "注销", "注销" + userId
+							+ "该用户时," + message);
 		}
 	}
 
@@ -1036,8 +1041,8 @@ public class FunctionManController {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
-					.toString(), "创建项目", message);
+			functionManDao.insertLog(DateUtil.getDateString(),
+					userMap.get("userId").toString(), "创建项目", message);
 		}
 	}
 
@@ -1091,8 +1096,8 @@ public class FunctionManController {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
-					.toString(), "创建组织", message);
+			functionManDao.insertLog(DateUtil.getDateString(),
+					userMap.get("userId").toString(), "创建组织", message);
 		}
 	}
 
@@ -1196,8 +1201,8 @@ public class FunctionManController {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
-					.toString(), "创建上下文", message);
+			functionManDao.insertLog(DateUtil.getDateString(),
+					userMap.get("userId").toString(), "创建上下文", message);
 		}
 	}
 
@@ -1353,8 +1358,8 @@ public class FunctionManController {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
-					.toString(), "添加权限", message);
+			functionManDao.insertLog(DateUtil.getDateString(),
+					userMap.get("userId").toString(), "添加权限", message);
 		}
 	}
 
@@ -1412,8 +1417,8 @@ public class FunctionManController {
 		pw.write(datagridStr);
 		pw.flush();
 		pw.close();
-		functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
-				.toString(), "权限查询", "查询成功");
+		functionManDao.insertLog(DateUtil.getDateString(), userMap
+				.get("userId").toString(), "权限查询", "查询成功");
 	}
 
 	/**
@@ -1486,8 +1491,8 @@ public class FunctionManController {
 		pw.write(datagridStr);
 		pw.flush();
 		pw.close();
-		functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
-				.toString(), "用户查询", "查询成功");
+		functionManDao.insertLog(DateUtil.getDateString(), userMap
+				.get("userId").toString(), "用户查询", "查询成功");
 	}
 
 	/**
@@ -1543,17 +1548,21 @@ public class FunctionManController {
 		pw.write(datagridStr);
 		pw.flush();
 		pw.close();
-		functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
-				.toString(), "权限查询", "查询成功");
+		functionManDao.insertLog(DateUtil.getDateString(), userMap
+				.get("userId").toString(), "权限查询", "查询成功");
 	}
 
 	/*
 	 * 日志查询功能
 	 * 
 	 * @param problemManagement
+	 * 
 	 * @param request
+	 * 
 	 * @return
+	 * 
 	 * @throws IOException
+	 * 
 	 * @see
 	 */
 	@RequestMapping("/logFileQuery")
@@ -1567,67 +1576,53 @@ public class FunctionManController {
 		String user_logFileQueryType = new String(request.getParameter(
 				"user_logFileQueryType").getBytes("ISO8859-1"), "utf-8");
 		List<Map<String, String>> queryuserData = new ArrayList<Map<String, String>>();// 日志查询功能
-		//----lifei,修改之前由文件读取日志信息改到数据库读取
-		/*if (allLogFileData.size() == 0 || allLogFileData == null) {
-			// 所有数据
-			allLogFileData = new ArrayList<String>();
-			String filepath = CommonProperties.getStringProperty("logFilePath");
-			;// 日志文件夹
-			Map<String, String> map = new HashMap<String, String>();
-			map.put("type", "2");// type为2的话为查询日志
-			File file = new File(filepath);
-			if (file.isDirectory()) {
-				String[] filelist = file.list();
-				for (int i = 0; i < filelist.length; i++) {
-					File readfile = new File(filepath + File.separator
-							+ filelist[i]);
-					try {
-						readFileByLines(readfile.getPath(), map, allLogFileData);// 解析日志文件夹
-					} catch (ParseException e) {
-						e.printStackTrace();
-					}
-				}
-			}
-		}
-		for (String logFileStr1 : allLogFileData) {
-			if (logFileStr1.contains("comtent1")
-					|| logFileStr1.contains("comtent2")) {
-				continue;
-			}
-			String[] tempStringArray = logFileStr1.split("\t");
-			if (!userlogFileQueryId.equals("") && userlogFileQueryId != null) {
-				if (logFileStr1.contains(userlogFileQueryId)) {
-					queryuserData.add(getMapInfo(tempStringArray));
-				}
-			} else if (!query_startDate.equals("") && query_startDate != null) {
-				int startCompare = tempStringArray[0].substring(0, 10)
-						.compareTo(query_startDate.toString());
-				if (startCompare >= 0) {
-					queryuserData.add(getMapInfo(tempStringArray));
-				}
-			} else if (!query_endDate.equals("") && query_endDate != null) {
-				int endCompare = tempStringArray[0].substring(0, 10).compareTo(
-						query_endDate.toString());
-				if (endCompare <= 0) {
-					queryuserData.add(getMapInfo(tempStringArray));
-				}
-			} else if (!user_logFileQueryType.equals(" ")
-					&& user_logFileQueryType != null) {
-				if (logFileStr1.contains(user_logFileQueryType)) {
-					queryuserData.add(getMapInfo(tempStringArray));
-				}
-			} else {
-				queryuserData.add(getMapInfo(tempStringArray));
-			}
-		}*/
-		List<Map<String, Object>> logsList = functionManDao.selectLog(query_startDate,query_endDate,
-				userlogFileQueryId,user_logFileQueryType);
+		// ----lifei,修改之前由文件读取日志信息改到数据库读取
+		/*
+		 * if (allLogFileData.size() == 0 || allLogFileData == null) { // 所有数据
+		 * allLogFileData = new ArrayList<String>(); String filepath =
+		 * CommonProperties.getStringProperty("logFilePath"); ;// 日志文件夹
+		 * Map<String, String> map = new HashMap<String, String>();
+		 * map.put("type", "2");// type为2的话为查询日志 File file = new File(filepath);
+		 * if (file.isDirectory()) { String[] filelist = file.list(); for (int i
+		 * = 0; i < filelist.length; i++) { File readfile = new File(filepath +
+		 * File.separator + filelist[i]); try {
+		 * readFileByLines(readfile.getPath(), map, allLogFileData);// 解析日志文件夹 }
+		 * catch (ParseException e) { e.printStackTrace(); } } } } for (String
+		 * logFileStr1 : allLogFileData) { if (logFileStr1.contains("comtent1")
+		 * || logFileStr1.contains("comtent2")) { continue; } String[]
+		 * tempStringArray = logFileStr1.split("\t"); if
+		 * (!userlogFileQueryId.equals("") && userlogFileQueryId != null) { if
+		 * (logFileStr1.contains(userlogFileQueryId)) {
+		 * queryuserData.add(getMapInfo(tempStringArray)); } } else if
+		 * (!query_startDate.equals("") && query_startDate != null) { int
+		 * startCompare = tempStringArray[0].substring(0, 10)
+		 * .compareTo(query_startDate.toString()); if (startCompare >= 0) {
+		 * queryuserData.add(getMapInfo(tempStringArray)); } } else if
+		 * (!query_endDate.equals("") && query_endDate != null) { int endCompare
+		 * = tempStringArray[0].substring(0, 10).compareTo(
+		 * query_endDate.toString()); if (endCompare <= 0) {
+		 * queryuserData.add(getMapInfo(tempStringArray)); } } else if
+		 * (!user_logFileQueryType.equals(" ") && user_logFileQueryType != null)
+		 * { if (logFileStr1.contains(user_logFileQueryType)) {
+		 * queryuserData.add(getMapInfo(tempStringArray)); } } else {
+		 * queryuserData.add(getMapInfo(tempStringArray)); } }
+		 */
+		List<Map<String, Object>> logsList = functionManDao.selectLog(
+				query_startDate, query_endDate, userlogFileQueryId,
+				user_logFileQueryType);
 		for (Map<String, Object> map : logsList) {
 			Map<String, String> m = new HashMap<String, String>();
-			m.put("userId", map.get("USER_NAME")==null?"":map.get("USER_NAME").toString());
-			m.put("date", map.get("CREATED_DATE")==null?"":map.get("CREATED_DATE").toString());
-			m.put("type", map.get("TYPE")==null?"":map.get("TYPE").toString());
-			m.put("content", map.get("CONTEXT")==null?"":map.get("CONTEXT").toString());
+			m.put("userId",
+					map.get("USER_NAME") == null ? "" : map.get("USER_NAME")
+							.toString());
+			m.put("date",
+					map.get("CREATED_DATE") == null ? "" : map.get(
+							"CREATED_DATE").toString());
+			m.put("type", map.get("TYPE") == null ? "" : map.get("TYPE")
+					.toString());
+			m.put("content",
+					map.get("CONTEXT") == null ? "" : map.get("CONTEXT")
+							.toString());
 			queryuserData.add(m);
 		}
 
@@ -1657,8 +1652,8 @@ public class FunctionManController {
 		pw.write(datagridStr);
 		pw.flush();
 		pw.close();
-		functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
-				.toString(), "审计查询", "查询成功");
+		functionManDao.insertLog(DateUtil.getDateString(), userMap
+				.get("userId").toString(), "审计查询", "查询成功");
 	}
 
 	@RequestMapping("/selectProj")
@@ -1701,8 +1696,8 @@ public class FunctionManController {
 		pw.write(datagridStr);
 		pw.flush();
 		pw.close();
-		functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
-				.toString(), "项目查询", "查询成功");
+		functionManDao.insertLog(DateUtil.getDateString(), userMap
+				.get("userId").toString(), "项目查询", "查询成功");
 	}
 
 	@RequestMapping("/selectOra")
@@ -1747,8 +1742,8 @@ public class FunctionManController {
 		pw.write(datagridStr);
 		pw.flush();
 		pw.close();
-		functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
-				.toString(), "组织查询", "查询成功");
+		functionManDao.insertLog(DateUtil.getDateString(), userMap
+				.get("userId").toString(), "组织查询", "查询成功");
 	}
 
 	private Map<String, String> getMapInfo(String[] tempStringArray)
@@ -1817,27 +1812,27 @@ public class FunctionManController {
 			String user_endDate = request.getParameter("user_endDate");
 			String user_operationType = new String(request.getParameter(
 					"user_operationType").getBytes("ISO8859-1"), "utf-8");
-			Map<String, String> map = new HashMap<String, String>();
-			map.put("type", "2");// type为2的话为审计管理导出查询
-			map.put("startDate", user_startDate);
-			map.put("endDate", user_endDate);
-			map.put("operationType", user_operationType);
-			map.put("operationWay", "用户行为审计");
-			List<String> datalist = new ArrayList<String>(); // 日志数据
-			String filepath = CommonProperties.getStringProperty("logFilePath");
-			;// 日志文件夹
-			File file = new File(filepath);
-			if (file.isDirectory()) {
-				String[] filelist = file.list();
-				for (int i = 0; i < filelist.length; i++) {
-					File readfile = new File(filepath + "/" + filelist[i]);
-					System.out.println("path=" + readfile.getPath());
-					readFileByLines(filepath + "/" + filelist[i], map, datalist);// 解析日志文件夹
-				}
-			}
+			// -----lifei,修改查询方式由文件读取改为数据库读取
+			/*
+			 * Map<String, String> map = new HashMap<String, String>();
+			 * map.put("type", "2");// type为2的话为审计管理导出查询 map.put("startDate",
+			 * user_startDate); map.put("endDate", user_endDate);
+			 * map.put("operationType", user_operationType);
+			 * map.put("operationWay", "用户行为审计"); List<String> datalist = new
+			 * ArrayList<String>(); // 日志数据 String filepath =
+			 * CommonProperties.getStringProperty("logFilePath"); ;// 日志文件夹 File
+			 * file = new File(filepath); if (file.isDirectory()) { String[]
+			 * filelist = file.list(); for (int i = 0; i < filelist.length; i++)
+			 * { File readfile = new File(filepath + "/" + filelist[i]);
+			 * System.out.println("path=" + readfile.getPath());
+			 * readFileByLines(filepath + "/" + filelist[i], map, datalist);//
+			 * 解析日志文件夹 } }
+			 */
 
 			// 导出excell
 			// 创建HSSFWorkbook对象(excel的文档对象)
+			List<Map<String, Object>> datalist = functionManDao.selectLog(
+					user_startDate, user_endDate, "", user_operationType);
 			HSSFWorkbook wb = new HSSFWorkbook();
 			// 头字体
 			HSSFFont headfond = wb.createFont();
@@ -1881,7 +1876,10 @@ public class FunctionManController {
 			HSSFCell cell2 = titleRow.createCell(2);
 			cell2.setCellValue("操作类型");
 			cell2.setCellStyle(cellStyle);
-			if ("登陆".equals(user_operationType)
+			HSSFCell cell3 = titleRow.createCell(3);
+			cell3.setCellValue("操作信息");
+			cell3.setCellStyle(cellStyle);
+			/*if ("登陆".equals(user_operationType)
 					|| "登出".equals(user_operationType)) {
 			} else if ("创建零件".equals(user_operationType)
 					|| "删除零件".equals(user_operationType)) {
@@ -1901,20 +1899,37 @@ public class FunctionManController {
 				HSSFCell cell3 = titleRow.createCell(3);
 				cell3.setCellValue("文档名称及版本");
 				cell3.setCellStyle(cellStyle);
-			}
+			}*/
 			for (int i = 0; i < datalist.size(); i++) {
 				HSSFRow row2 = sheet.createRow(i + 2);
-				String[] datalistArray = datalist.get(i).split("\t");
-				arrSize = datalistArray.length;
-				for (int j = 0; j < arrSize; j++) {
-					HSSFCell cellj = row2.createCell(j);
-					cellj.setCellStyle(cellStyle);
-					cellj.setCellValue(datalistArray[j].toString().trim());
-				}
+				/*
+				 * String[] datalistArray = datalist.get(i).split("\t"); arrSize
+				 * = datalistArray.length; for (int j = 0; j < arrSize; j++) {
+				 * HSSFCell cellj = row2.createCell(j);
+				 * cellj.setCellStyle(cellStyle);
+				 * cellj.setCellValue(datalistArray[j].toString().trim()); }
+				 */
+				Map<String, Object> map = datalist.get(i);
+				HSSFCell cell00 = row2.createCell(0);
+				cell00.setCellStyle(cellStyle);
+				cell00.setCellValue(map.get("CREATED_DATE")==null?"":map.get("CREATED_DATE").toString());
+				
+				HSSFCell cell11 = row2.createCell(1);
+				cell11.setCellStyle(cellStyle);
+				cell11.setCellValue(map.get("USER_NAME")==null?"":map.get("USER_NAME").toString());
+				
+				HSSFCell cell22 = row2.createCell(2);
+				cell22.setCellStyle(cellStyle);
+				cell22.setCellValue(map.get("TYPE")==null?"":map.get("TYPE").toString());
+				
+				HSSFCell cell33 = row2.createCell(3);
+				cell33.setCellStyle(cellStyle);
+				cell33.setCellValue(map.get("CONTEXT")==null?"":map.get("CONTEXT").toString());
+				
 			}
-			if (arrSize > 0) {
+			/*if (arrSize > 0) {
 				sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, arrSize - 1));
-			}
+			}*/
 			sheet.setDefaultColumnWidth(40);
 			// 输出Excel文件
 			response.reset();
@@ -1925,8 +1940,8 @@ public class FunctionManController {
 			OutputStream output = response.getOutputStream();
 			wb.write(output);
 			output.close();
-			functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
-					.toString(), "用户行为审计", "导出成功");
+			functionManDao.insertLog(DateUtil.getDateString(),
+					userMap.get("userId").toString(), "用户行为审计", "导出成功");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -1944,7 +1959,7 @@ public class FunctionManController {
 			if ("用户删除".equals(sec_operationType)) {
 				sec_operationType = "UpdatePerson";// 注意，由于并不是真正的从P&O中删除该用户而是修改用户信息，所以删除用户这个操作在VPM的日志中变更为UpdatePerson，因此WEB端在查询日志的时候需要注意。
 			}
-			Map<String, String> map = new HashMap<String, String>();
+			/*Map<String, String> map = new HashMap<String, String>();
 			map.put("type", "2");// type为2的话为审计管理导出查询
 			map.put("startDate", sec_startDate);
 			map.put("endDate", sec_endDate);
@@ -1962,9 +1977,11 @@ public class FunctionManController {
 					System.out.println("path=" + readfile.getPath());
 					readFileByLines(filepath + "/" + filelist[i], map, datalist);// 解析日志文件夹
 				}
-			}
+			}*/
 			// 导出excell
 			// 创建HSSFWorkbook对象(excel的文档对象)
+			List<Map<String, Object>> datalist = functionManDao.selectLog(
+					sec_startDate, sec_endDate, "", sec_operationType);
 			HSSFWorkbook wb = new HSSFWorkbook();
 			// 头字体
 			HSSFFont headfond = wb.createFont();
@@ -2007,7 +2024,10 @@ public class FunctionManController {
 			HSSFCell cell2 = titleRow.createCell(2);
 			cell2.setCellValue("操作类型");
 			cell2.setCellStyle(cellStyle);
-			if ("用户创建".equals(sec_operationType)
+			HSSFCell cell3 = titleRow.createCell(3);
+			cell3.setCellValue("操作信息");
+			cell3.setCellStyle(cellStyle);
+			/*if ("用户创建".equals(sec_operationType)
 					|| "用户删除".equals(sec_operationType)
 					|| "UpdatePerson".equals(sec_operationType)) {
 				HSSFCell cell3 = titleRow.createCell(3);
@@ -2027,10 +2047,10 @@ public class FunctionManController {
 				HSSFCell cell4 = titleRow.createCell(4);
 				cell4.setCellValue("用户名");
 				cell4.setCellStyle(cellStyle);
-			}
+			}*/
 			for (int i = 0; i < datalist.size(); i++) {
 				HSSFRow row2 = sheet.createRow(i + 2);
-				String[] datalistArray = datalist.get(i).split("\t");
+				/*String[] datalistArray = datalist.get(i).split("\t");
 				arrSize = datalistArray.length;
 				for (int j = 0; j < arrSize; j++) {
 					HSSFCell cellj = row2.createCell(j);
@@ -2042,11 +2062,28 @@ public class FunctionManController {
 						sheet.setColumnWidth(3, datalistArray[j].toString()
 								.trim().getBytes().length * 2 * 256);
 					}
-				}
+				}*/
+				Map<String, Object> map = datalist.get(i);
+				HSSFCell cell00 = row2.createCell(0);
+				cell00.setCellStyle(cellStyle);
+				cell00.setCellValue(map.get("CREATED_DATE")==null?"":map.get("CREATED_DATE").toString());
+				
+				HSSFCell cell11 = row2.createCell(1);
+				cell11.setCellStyle(cellStyle);
+				cell11.setCellValue(map.get("USER_NAME")==null?"":map.get("USER_NAME").toString());
+				
+				HSSFCell cell22 = row2.createCell(2);
+				cell22.setCellStyle(cellStyle);
+				cell22.setCellValue(map.get("TYPE")==null?"":map.get("TYPE").toString());
+				
+				HSSFCell cell33 = row2.createCell(3);
+				cell33.setCellStyle(cellStyle);
+				cell33.setCellValue(map.get("CONTEXT")==null?"":map.get("CONTEXT").toString());
+				
 			}
-			if (arrSize > 0) {
+			/*if (arrSize > 0) {
 				sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, arrSize - 1));
-			}
+			}*/
 			sheet.setDefaultColumnWidth(40);
 			// 输出Excel文件
 			response.reset();
@@ -2057,8 +2094,8 @@ public class FunctionManController {
 			OutputStream output = response.getOutputStream();
 			wb.write(output);
 			output.close();
-			functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId")
-					.toString(), "管理员行为审计", "导出成功");
+			functionManDao.insertLog(DateUtil.getDateString(),
+					userMap.get("userId").toString(), "管理员行为审计", "导出成功");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -2255,7 +2292,7 @@ public class FunctionManController {
 	 * 定时任务，每天凌晨一点去查询P&O的文件数据放在全局变量里面 每天凌晨一点 0 0 1 * * ?
 	 */
 	// 测试： 每2分钟执行（由于P&O导出） 0 */2 * * * ?
-	//@Scheduled(cron = "0 */2 * * * ?"/* cron = "0 0 2 * * ?" */)
+	// @Scheduled(cron = "0 */2 * * * ?"/* cron = "0 0 2 * * ?" */)
 	public void getAllDataByScheduled() throws Exception {
 		System.out.println("定时任务2分钟执行----------------------");
 		// 所有数据
@@ -2291,13 +2328,14 @@ public class FunctionManController {
 			String[] tempStringArray = logFileStr1.split("\t");
 			queryuserData.add(getMapInfo(tempStringArray));
 		}
-		/*if (queryuserData.isEmpty()) {
-			System.out.println("查询文件日志数据为空");
-			return;
-		}*/
+		/*
+		 * if (queryuserData.isEmpty()) { System.out.println("查询文件日志数据为空");
+		 * return; }
+		 */
 		// 将历史日志数据存入数据库
 		for (Map<String, String> map : queryuserData) {
-			if("".equals(map.get("type").toString())&&"".equals(map.get("userId").toString())){
+			if ("".equals(map.get("type").toString())
+					&& "".equals(map.get("userId").toString())) {
 				continue;
 			}
 			functionManDao.insertLog(map.get("date").toString(),
@@ -2306,10 +2344,10 @@ public class FunctionManController {
 		}
 		// 将历史文件重新放个位置
 		String logFilePath = CommonProperties.getStringProperty("logFilePath");
-		System.out.println("历史日志源位置:"+logFilePath);
+		System.out.println("历史日志源位置:" + logFilePath);
 		String logFileHistoryPath = CommonProperties
 				.getStringProperty("logFil+eHistoryPath");
-		System.out.println("历史日志新位置:"+logFileHistoryPath);
+		System.out.println("历史日志新位置:" + logFileHistoryPath);
 		FileUtils.copyDir(logFilePath, logFileHistoryPath);
 		System.out.println("---清理完成---");
 	}
