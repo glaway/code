@@ -19,9 +19,7 @@
       <root url="jar://$PROJECT_DIR$/WebContent/WEB-INF/lib/druid-1.0.25.jar!/" />
       <root url="jar://$PROJECT_DIR$/WebContent/WEB-INF/lib/ezmorph-1.0.6.jar!/" />
       <root url="jar://$PROJECT_DIR$/WebContent/WEB-INF/lib/fastjson-1.1.37.jar!/" />
-      <root url="jar://$PROJECT_DIR$/WebContent/WEB-INF/lib/httpclient-4.2.1.jar!/" />
       <root url="jar://$PROJECT_DIR$/WebContent/WEB-INF/lib/httpclient-cache-4.2.1.jar!/" />
-      <root url="jar://$PROJECT_DIR$/WebContent/WEB-INF/lib/httpcore-4.2.1.jar!/" />
       <root url="jar://$PROJECT_DIR$/WebContent/WEB-INF/lib/httpmime-4.2.1.jar!/" />
       <root url="jar://$PROJECT_DIR$/WebContent/WEB-INF/lib/jackson-1.84.jar!/" />
       <root url="jar://$PROJECT_DIR$/WebContent/WEB-INF/lib/jackson-all-1.6.2.jar!/" />

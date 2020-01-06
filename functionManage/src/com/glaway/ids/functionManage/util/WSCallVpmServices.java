@@ -56,10 +56,10 @@ public class WSCallVpmServices {
 		new RunThread(process2.getErrorStream(), "ERR").start();
 		int value = process2.waitFor();
 		if (value==0) {
-			System.out.println("success");
+			System.out.println("---success---");
 			return fileName;
 		}else {
-			System.out.println("fail");
+			System.out.println("---fail---");
 			return "error";
 		}
 	}

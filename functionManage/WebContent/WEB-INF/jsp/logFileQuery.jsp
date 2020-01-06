@@ -71,7 +71,7 @@
 		
 		//重置
 		function resetUserAndContextIdList1() {
-			$('#queryOrUpdateform').form('clear'); 
+			$('#userAndContextIdform').form('clear'); 
 		}
 	</script>
 	<div id="userAndContextIddiv"	style="width: 100%; height: 100%" >
@@ -89,12 +89,25 @@
 						    <option value=""> </option>   
 						    <option value="登陆">登陆</option>   
 						    <option value="登出">登出</option>   
+						    <option value="注销">注销</option>  
+						    <option value="修改密码">修改密码</option>  
+						    <option value="重置密码">重置密码</option>  
+						    <option value="创建项目">创建项目</option>  
+						    <option value="项目查询">项目查询</option>  
+						    <option value="创建组织">创建组织</option>  
+						    <option value="组织查询">组织查询</option>  
+						    <option value="用户行为审计">用户行为审计</option>  
+						    <option value="管理员行为审计">管理员行为审计</option>  
+						    <option value="创建上下文">创建上下文</option>  
 						    <option value="创建零件">创建零件</option>   
 						    <option value="删除零件">删除零件</option>   
 						    <option value="删除图文档">删除图文档</option>   
 						    <option value="用户创建">用户创建</option>   
+						    <option value="用户查询">用户查询</option>   
 						    <option value="用户删除">用户删除</option>   
 						    <option value="添加权限">添加权限</option>   
+						    <option value="权限查询">权限查询</option>   
+						    <option value="审计查询">审计查询</option>   
 						    <option value="删除权限">删除权限</option>   
 						    <option value="修改权限">修改权限</option>
 						    <option value="添加上下文用户">添加上下文用户</option>   

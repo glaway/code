@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.glaway.ids.functionManage.service.UserCenterService;
 import com.glaway.ids.functionManage.util.*;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpResponse;
@@ -36,11 +37,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.glaway.ids.functionManage.dao.FunctionManDao;
 import com.glaway.ids.functionManage.properties.CommonProperties;
-
 
 @Controller
 public class FunctionManController {
@@ -56,14 +57,14 @@ public class FunctionManController {
 	 * 
 	 * public static ServletContext application;
 	 */
-	
-	public Map<String, String> userMap = new HashMap<String, String>();
 
+	public Map<String, String> userMap = new HashMap<String, String>();
 
 	/**
 	 * 生成日志<br>
 	 */
-	private static final Log log = LogFactory.getLog(FunctionManController.class);
+	private static final Log log = LogFactory
+			.getLog(FunctionManController.class);
 
 	public static List<Map<String, String>> alluserData = new ArrayList<Map<String, String>>();// 用户数据
 	public static List<Map<String, String>> allpermissionsData = new ArrayList<Map<String, String>>();// 权限数据
@@ -86,7 +87,7 @@ public class FunctionManController {
 	public String exit(HttpServletRequest request) {
 		request.getSession().invalidate();
 		functionManDao.insertLog(getDateString(), userMap.get("userId")
-				.toString(), "退出", "退出成功");
+				.toString(), "注销", "注销成功");
 		return "login";
 	}
 
@@ -209,7 +210,7 @@ public class FunctionManController {
 	 *
 	 * 获取Token信息
 	 */
-	public void findToken(){
+	public void findToken() {
 
 	}
 
@@ -217,7 +218,7 @@ public class FunctionManController {
 	@ResponseBody
 	public void export_po(HttpServletRequest request,
 			HttpServletResponse response) {
-		Map<String,String> result = new HashMap<String, String>();
+		Map<String, String> result = new HashMap<String, String>();
 		result.put("message", "失败");
 		try {
 			alluserData = new ArrayList<Map<String, String>>();
@@ -231,8 +232,8 @@ public class FunctionManController {
 					.getStringProperty("testFilePath");
 			String textName = "PO_query";
 			String fileName = textPath + textName;
-			WSCallVpmServices wSCallVpmServices = new WSCallVpmServices();
-			wSCallVpmServices.callVpmServices("export", fileName);
+			/*WSCallVpmServices wSCallVpmServices = new WSCallVpmServices();
+			wSCallVpmServices.callVpmServices("-export", fileName);*/
 			System.out.println(fileName);
 			File queryFile = new File(fileName);
 			if (!queryFile.exists()) {
@@ -692,14 +693,13 @@ public class FunctionManController {
 				viewPage = "editPwd";
 				request.setAttribute("id_userId",
 						request.getParameter("id_userId"));
-			}else if("selectProj".equals(method)){
+			} else if ("selectProj".equals(method)) {
 				viewPage = "selectProj";
 			} else if ("createProj".equals(method)) {// 3创建项目
 				viewPage = "createProj";
-			} else if("selectOra".equals(method)){
+			} else if ("selectOra".equals(method)) {
 				viewPage = "selectOra";
-			}
-			else if ("createLogicOrga".equals(method)) {// 4创建逻辑组织
+			} else if ("createLogicOrga".equals(method)) {// 4创建逻辑组织
 				viewPage = "createLogicOrga";
 			} else if ("updateUserInfo".equals(method)) {// 5、2中的修改页面跳转
 				viewPage = "updateUserInfo";
@@ -1528,7 +1528,7 @@ public class FunctionManController {
 		pw.flush();
 		pw.close();
 		functionManDao.insertLog(getDateString(), userMap.get("userId")
-				.toString(), "用户权限查询", "查询成功");
+				.toString(), "权限查询", "查询成功");
 	}
 
 	/**
@@ -1551,8 +1551,8 @@ public class FunctionManController {
 		String user_logFileQueryType = new String(request.getParameter(
 				"user_logFileQueryType").getBytes("ISO8859-1"), "utf-8");
 		List<Map<String, String>> queryuserData = new ArrayList<Map<String, String>>();// 日志查询功能
-		// 第一次全部查询，后面定时任务查询
-		if (allLogFileData.size() == 0 || allLogFileData == null) {
+		//----lifei,修改之前由文件读取日志信息改到数据库读取
+		/*if (allLogFileData.size() == 0 || allLogFileData == null) {
 			// 所有数据
 			allLogFileData = new ArrayList<String>();
 			String filepath = CommonProperties.getStringProperty("logFilePath");
@@ -1563,7 +1563,8 @@ public class FunctionManController {
 			if (file.isDirectory()) {
 				String[] filelist = file.list();
 				for (int i = 0; i < filelist.length; i++) {
-					File readfile = new File(filepath + File.separator + filelist[i]);
+					File readfile = new File(filepath + File.separator
+							+ filelist[i]);
 					try {
 						readFileByLines(readfile.getPath(), map, allLogFileData);// 解析日志文件夹
 					} catch (ParseException e) {
@@ -1602,18 +1603,18 @@ public class FunctionManController {
 			} else {
 				queryuserData.add(getMapInfo(tempStringArray));
 			}
-		}
-		
-		List<Map<String, Object>> logsList = functionManDao.selectLog();
+		}*/
+		List<Map<String, Object>> logsList = functionManDao.selectLog(query_startDate,query_endDate,
+				userlogFileQueryId,user_logFileQueryType);
 		for (Map<String, Object> map : logsList) {
-			Map<String,String> m = new HashMap<String, String>();
-			m.put("userId", map.get("USER_NAME").toString());
-			m.put("date", map.get("CREATED_DATE").toString());
-			m.put("type", map.get("TYPE").toString());
-			m.put("content", map.get("CONTEXT").toString());
+			Map<String, String> m = new HashMap<String, String>();
+			m.put("userId", map.get("USER_NAME")==null?"":map.get("USER_NAME").toString());
+			m.put("date", map.get("CREATED_DATE")==null?"":map.get("CREATED_DATE").toString());
+			m.put("type", map.get("TYPE")==null?"":map.get("TYPE").toString());
+			m.put("content", map.get("CONTEXT")==null?"":map.get("CONTEXT").toString());
 			queryuserData.add(m);
 		}
-		
+
 		String pageNumber = request.getParameter("pageNumber") == null
 				|| request.getParameter("pageNumber").equals("") ? "1"
 				: request.getParameter("pageNumber");
@@ -1628,6 +1629,8 @@ public class FunctionManController {
 				&& i < queryuserData.size(); i++) {
 			queryuserPageData.add(queryuserData.get(i));
 		}
+		queryuserData.remove(null);
+		queryuserPageData.remove(null);
 		String datagridStr = "{\"rows\":"
 				+ JSON.toJSONString(queryuserPageData) + ",\"total\":"
 				+ queryuserData.size() + "}";
@@ -1641,19 +1644,19 @@ public class FunctionManController {
 		functionManDao.insertLog(getDateString(), userMap.get("userId")
 				.toString(), "审计查询", "查询成功");
 	}
-	
+
 	@RequestMapping("/selectProj")
 	@ResponseBody
 	public void selectProj(HttpServletRequest request,
-			HttpServletResponse response) throws Exception{
+			HttpServletResponse response) throws Exception {
 		String projectName = request.getParameter("projectName");
-		List<Map<String,String>> queryuserData = new ArrayList<Map<String,String>>();
-		if(projectName==null||"".equals(projectName)){
+		List<Map<String, String>> queryuserData = new ArrayList<Map<String, String>>();
+		if (projectName == null || "".equals(projectName)) {
 			queryuserData = allprojectData;
-		}else {
+		} else {
 			for (Map<String, String> proj : allprojectData) {
 				String project_name = proj.get("project_name");
-				if(projectName.equals(project_name)){
+				if (projectName.equals(project_name)) {
 					queryuserData.add(proj);
 				}
 			}
@@ -1685,20 +1688,21 @@ public class FunctionManController {
 		functionManDao.insertLog(getDateString(), userMap.get("userId")
 				.toString(), "项目查询", "查询成功");
 	}
-	
+
 	@RequestMapping("/selectOra")
 	@ResponseBody
 	public void selectOra(HttpServletRequest request,
-			HttpServletResponse response) throws Exception{
+			HttpServletResponse response) throws Exception {
 		String oraName = request.getParameter("oraName");
 		String oraNumber = request.getParameter("oraNumber");
-		List<Map<String,String>> queryuserData = new ArrayList<Map<String,String>>();
-		if((oraName==null||"".equals(oraName))&&(oraNumber==null||"".equals(oraNumber))){
+		List<Map<String, String>> queryuserData = new ArrayList<Map<String, String>>();
+		if ((oraName == null || "".equals(oraName))
+				&& (oraNumber == null || "".equals(oraNumber))) {
 			queryuserData = allorginaztionData;
-		}else {
+		} else {
 			for (Map<String, String> proj : allorginaztionData) {
 				String ora_id = proj.get("org_id");
-				if(ora_id.equals(oraNumber)){
+				if (ora_id.equals(oraNumber)) {
 					queryuserData.add(proj);
 				}
 			}
@@ -2067,6 +2071,7 @@ public class FunctionManController {
 				String halfString = "";
 				do {
 					tempString = reader.readLine();
+					tempString = tempString.trim();
 					if (tempString != null && !"null".equals(tempString)) {
 						if (y == i && !"".equals(halfString)) {
 							tempList.remove(halfString);
@@ -2214,7 +2219,6 @@ public class FunctionManController {
 								}
 							}
 						}
-
 					}
 				} while ((tempString = reader.readLine()) != null);
 			}
@@ -2235,20 +2239,21 @@ public class FunctionManController {
 	 * 定时任务，每天凌晨一点去查询P&O的文件数据放在全局变量里面 每天凌晨一点 0 0 1 * * ?
 	 */
 	// 测试： 每2分钟执行（由于P&O导出） 0 */2 * * * ?
-	@Scheduled(cron = "0 0 2 * * ?")
-	public void getAllDataByScheduled() throws Exception{
+	//@Scheduled(cron = "0 */2 * * * ?"/* cron = "0 0 2 * * ?" */)
+	public void getAllDataByScheduled() throws Exception {
 		System.out.println("定时任务2分钟执行----------------------");
 		// 所有数据
 		allLogFileData = new ArrayList<String>();
 		String filepath = CommonProperties.getStringProperty("logFilePath");
-		;// 日志文件夹
+		// 日志文件夹
 		Map<String, String> map = new HashMap<String, String>();
 		map.put("type", "2");// type为2的话为查询日志
 		File file = new File(filepath);
 		if (file.isDirectory()) {
 			String[] filelist = file.list();
 			for (int i = 0; i < filelist.length; i++) {
-				File readfile = new File(filepath + File.separator + filelist[i]);
+				File readfile = new File(filepath + File.separator
+						+ filelist[i]);
 				try {
 					readFileByLines(readfile.getPath(), map, allLogFileData);// 解析日志文件夹
 				} catch (ParseException e) {
@@ -2258,11 +2263,10 @@ public class FunctionManController {
 		}
 		List<Map<String, String>> queryuserData = new ArrayList<Map<String, String>>();// 日志查询功能
 		parmasParse(queryuserData);
-	
 	}
-	
-	
-	public void parmasParse(List<Map<String, String>> queryuserData) throws UnsupportedEncodingException {
+
+	public void parmasParse(List<Map<String, String>> queryuserData)
+			throws IOException {
 		for (String logFileStr1 : allLogFileData) {
 			if (logFileStr1.contains("comtent1")
 					|| logFileStr1.contains("comtent2")) {
@@ -2271,30 +2275,50 @@ public class FunctionManController {
 			String[] tempStringArray = logFileStr1.split("\t");
 			queryuserData.add(getMapInfo(tempStringArray));
 		}
-		
+		/*if (queryuserData.isEmpty()) {
+			System.out.println("查询文件日志数据为空");
+			return;
+		}*/
+		// 将历史日志数据存入数据库
+		for (Map<String, String> map : queryuserData) {
+			if("".equals(map.get("type").toString())&&"".equals(map.get("userId").toString())){
+				continue;
+			}
+			functionManDao.insertLog(map.get("date").toString(),
+					map.get("userId").toString(), map.get("type").toString(),
+					map.get("content").toString());
+		}
+		// 将历史文件重新放个位置
+		String logFilePath = CommonProperties.getStringProperty("logFilePath");
+		System.out.println("历史日志源位置:"+logFilePath);
+		String logFileHistoryPath = CommonProperties
+				.getStringProperty("logFil+eHistoryPath");
+		System.out.println("历史日志新位置:"+logFileHistoryPath);
+		FileUtils.copyDir(logFilePath, logFileHistoryPath);
+		System.out.println("---清理完成---");
 	}
-
 
 	@RequestMapping(value = "/getTokenTest", method = RequestMethod.POST)
 	@ResponseBody
-	public String getTokenTest(){
+	public String getTokenTest() {
 		Map<String, String> tokenMap = new HashMap<String, String>(16);
-		tokenMap.put("token","test123");
+		tokenMap.put("token", "test123");
 		String result = null;
 		try {
-			result = new String((JSONObject.toJSONString(tokenMap).getBytes("ISO-8859-1")),"utf-8");
+			result = new String(
+					(JSONObject.toJSONString(tokenMap).getBytes("ISO-8859-1")),
+					"utf-8");
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
 		return result;
 	}
 
-
 	@RequestMapping(value = "/getOrg", method = RequestMethod.GET)
 	@ResponseBody
-	public String getOrg(){
+	public String getOrg() {
 		userCenterService.getOrg();
-		return  "success";
+		return "success";
 	}
 
 }

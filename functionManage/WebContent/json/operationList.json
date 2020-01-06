@@ -1,6 +1,6 @@
 {"total":15,                                                      
 "rows":[                                                          
-	{"contextId":"XXX1","type":"VPM","operationGroup":"Login","dataGroup":"1"}       
+	{"content":"XXX1","type":"VPM","userId":"Login","date":"1"}       
 ]}  
 
 
