@@ -235,10 +235,10 @@ public class FunctionManController {
 					.getStringProperty("testFilePath");
 			String textName = "PO_query";
 			String fileName = textPath + textName;
-			/*
-			 * WSCallVpmServices wSCallVpmServices = new WSCallVpmServices();
-			 * wSCallVpmServices.callVpmServices("-export", fileName);
-			 */
+
+			WSCallVpmServices wSCallVpmServices = new WSCallVpmServices();
+			wSCallVpmServices.callVpmServices("-export", fileName);
+
 			System.out.println(fileName);
 			File queryFile = new File(fileName);
 			if (!queryFile.exists()) {
@@ -1879,27 +1879,23 @@ public class FunctionManController {
 			HSSFCell cell3 = titleRow.createCell(3);
 			cell3.setCellValue("操作信息");
 			cell3.setCellStyle(cellStyle);
-			/*if ("登陆".equals(user_operationType)
-					|| "登出".equals(user_operationType)) {
-			} else if ("创建零件".equals(user_operationType)
-					|| "删除零件".equals(user_operationType)) {
-				HSSFCell cell3 = titleRow.createCell(3);
-				cell3.setCellValue("零件实例名");
-				cell3.setCellStyle(cellStyle);
-				HSSFCell cell4 = titleRow.createCell(4);
-				cell4.setCellValue("零件参考名");
-				cell4.setCellStyle(cellStyle);
-				HSSFCell cell5 = titleRow.createCell(5);
-				cell5.setCellValue("版本");
-				cell5.setCellStyle(cellStyle);
-				HSSFCell cell6 = titleRow.createCell(6);
-				cell6.setCellValue("父节点实例名称");
-				cell6.setCellStyle(cellStyle);
-			} else if ("删除图文档".equals(user_operationType)) {
-				HSSFCell cell3 = titleRow.createCell(3);
-				cell3.setCellValue("文档名称及版本");
-				cell3.setCellStyle(cellStyle);
-			}*/
+			/*
+			 * if ("登陆".equals(user_operationType) ||
+			 * "登出".equals(user_operationType)) { } else if
+			 * ("创建零件".equals(user_operationType) ||
+			 * "删除零件".equals(user_operationType)) { HSSFCell cell3 =
+			 * titleRow.createCell(3); cell3.setCellValue("零件实例名");
+			 * cell3.setCellStyle(cellStyle); HSSFCell cell4 =
+			 * titleRow.createCell(4); cell4.setCellValue("零件参考名");
+			 * cell4.setCellStyle(cellStyle); HSSFCell cell5 =
+			 * titleRow.createCell(5); cell5.setCellValue("版本");
+			 * cell5.setCellStyle(cellStyle); HSSFCell cell6 =
+			 * titleRow.createCell(6); cell6.setCellValue("父节点实例名称");
+			 * cell6.setCellStyle(cellStyle); } else if
+			 * ("删除图文档".equals(user_operationType)) { HSSFCell cell3 =
+			 * titleRow.createCell(3); cell3.setCellValue("文档名称及版本");
+			 * cell3.setCellStyle(cellStyle); }
+			 */
 			for (int i = 0; i < datalist.size(); i++) {
 				HSSFRow row2 = sheet.createRow(i + 2);
 				/*
@@ -1912,24 +1908,29 @@ public class FunctionManController {
 				Map<String, Object> map = datalist.get(i);
 				HSSFCell cell00 = row2.createCell(0);
 				cell00.setCellStyle(cellStyle);
-				cell00.setCellValue(map.get("CREATED_DATE")==null?"":map.get("CREATED_DATE").toString());
-				
+				cell00.setCellValue(map.get("CREATED_DATE") == null ? "" : map
+						.get("CREATED_DATE").toString());
+
 				HSSFCell cell11 = row2.createCell(1);
 				cell11.setCellStyle(cellStyle);
-				cell11.setCellValue(map.get("USER_NAME")==null?"":map.get("USER_NAME").toString());
-				
+				cell11.setCellValue(map.get("USER_NAME") == null ? "" : map
+						.get("USER_NAME").toString());
+
 				HSSFCell cell22 = row2.createCell(2);
 				cell22.setCellStyle(cellStyle);
-				cell22.setCellValue(map.get("TYPE")==null?"":map.get("TYPE").toString());
-				
+				cell22.setCellValue(map.get("TYPE") == null ? "" : map.get(
+						"TYPE").toString());
+
 				HSSFCell cell33 = row2.createCell(3);
 				cell33.setCellStyle(cellStyle);
-				cell33.setCellValue(map.get("CONTEXT")==null?"":map.get("CONTEXT").toString());
-				
+				cell33.setCellValue(map.get("CONTEXT") == null ? "" : map.get(
+						"CONTEXT").toString());
+
 			}
-			/*if (arrSize > 0) {
-				sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, arrSize - 1));
-			}*/
+			/*
+			 * if (arrSize > 0) { sheet.addMergedRegion(new CellRangeAddress(0,
+			 * 0, 0, arrSize - 1)); }
+			 */
 			sheet.setDefaultColumnWidth(40);
 			// 输出Excel文件
 			response.reset();
@@ -1959,25 +1960,21 @@ public class FunctionManController {
 			if ("用户删除".equals(sec_operationType)) {
 				sec_operationType = "UpdatePerson";// 注意，由于并不是真正的从P&O中删除该用户而是修改用户信息，所以删除用户这个操作在VPM的日志中变更为UpdatePerson，因此WEB端在查询日志的时候需要注意。
 			}
-			/*Map<String, String> map = new HashMap<String, String>();
-			map.put("type", "2");// type为2的话为审计管理导出查询
-			map.put("startDate", sec_startDate);
-			map.put("endDate", sec_endDate);
-			map.put("operationType", sec_operationType);
-			map.put("operationWay", "管理员行为审计");
-			// 查找日志文件
-			List<String> datalist = new ArrayList<String>(); // 日志数据
-			String filepath = CommonProperties.getStringProperty("logFilePath");
-			;// 日志文件夹
-			File file = new File(filepath);
-			if (file.isDirectory()) {
-				String[] filelist = file.list();
-				for (int i = 0; i < filelist.length; i++) {
-					File readfile = new File(filepath + "/" + filelist[i]);
-					System.out.println("path=" + readfile.getPath());
-					readFileByLines(filepath + "/" + filelist[i], map, datalist);// 解析日志文件夹
-				}
-			}*/
+			/*
+			 * Map<String, String> map = new HashMap<String, String>();
+			 * map.put("type", "2");// type为2的话为审计管理导出查询 map.put("startDate",
+			 * sec_startDate); map.put("endDate", sec_endDate);
+			 * map.put("operationType", sec_operationType);
+			 * map.put("operationWay", "管理员行为审计"); // 查找日志文件 List<String>
+			 * datalist = new ArrayList<String>(); // 日志数据 String filepath =
+			 * CommonProperties.getStringProperty("logFilePath"); ;// 日志文件夹 File
+			 * file = new File(filepath); if (file.isDirectory()) { String[]
+			 * filelist = file.list(); for (int i = 0; i < filelist.length; i++)
+			 * { File readfile = new File(filepath + "/" + filelist[i]);
+			 * System.out.println("path=" + readfile.getPath());
+			 * readFileByLines(filepath + "/" + filelist[i], map, datalist);//
+			 * 解析日志文件夹 } }
+			 */
 			// 导出excell
 			// 创建HSSFWorkbook对象(excel的文档对象)
 			List<Map<String, Object>> datalist = functionManDao.selectLog(
@@ -2027,63 +2024,64 @@ public class FunctionManController {
 			HSSFCell cell3 = titleRow.createCell(3);
 			cell3.setCellValue("操作信息");
 			cell3.setCellStyle(cellStyle);
-			/*if ("用户创建".equals(sec_operationType)
-					|| "用户删除".equals(sec_operationType)
-					|| "UpdatePerson".equals(sec_operationType)) {
-				HSSFCell cell3 = titleRow.createCell(3);
-				cell3.setCellValue("用户名");
-				cell3.setCellStyle(cellStyle);
-			} else if ("添加权限".equals(sec_operationType)
-					|| "删除权限".equals(sec_operationType)
-					|| "修改权限".equals(sec_operationType)) {
-				HSSFCell cell3 = titleRow.createCell(3);
-				cell3.setCellValue("上下文");
-				cell3.setCellStyle(cellStyle);
-			} else if ("添加上下文用户".equals(sec_operationType)
-					|| "删除上下文用户".equals(sec_operationType)) {
-				HSSFCell cell3 = titleRow.createCell(3);
-				cell3.setCellValue("上下文");
-				cell3.setCellStyle(cellStyle);
-				HSSFCell cell4 = titleRow.createCell(4);
-				cell4.setCellValue("用户名");
-				cell4.setCellStyle(cellStyle);
-			}*/
+			/*
+			 * if ("用户创建".equals(sec_operationType) ||
+			 * "用户删除".equals(sec_operationType) ||
+			 * "UpdatePerson".equals(sec_operationType)) { HSSFCell cell3 =
+			 * titleRow.createCell(3); cell3.setCellValue("用户名");
+			 * cell3.setCellStyle(cellStyle); } else if
+			 * ("添加权限".equals(sec_operationType) ||
+			 * "删除权限".equals(sec_operationType) ||
+			 * "修改权限".equals(sec_operationType)) { HSSFCell cell3 =
+			 * titleRow.createCell(3); cell3.setCellValue("上下文");
+			 * cell3.setCellStyle(cellStyle); } else if
+			 * ("添加上下文用户".equals(sec_operationType) ||
+			 * "删除上下文用户".equals(sec_operationType)) { HSSFCell cell3 =
+			 * titleRow.createCell(3); cell3.setCellValue("上下文");
+			 * cell3.setCellStyle(cellStyle); HSSFCell cell4 =
+			 * titleRow.createCell(4); cell4.setCellValue("用户名");
+			 * cell4.setCellStyle(cellStyle); }
+			 */
 			for (int i = 0; i < datalist.size(); i++) {
 				HSSFRow row2 = sheet.createRow(i + 2);
-				/*String[] datalistArray = datalist.get(i).split("\t");
-				arrSize = datalistArray.length;
-				for (int j = 0; j < arrSize; j++) {
-					HSSFCell cellj = row2.createCell(j);
-					cellj.setCellStyle(cellStyle);
-					cellj.setCellValue(datalistArray[j].toString().trim());
-					if (("添加权限".equals(sec_operationType)
-							|| "删除权限".equals(sec_operationType) || "修改权限"
-								.equals(sec_operationType)) && j == 3) {
-						sheet.setColumnWidth(3, datalistArray[j].toString()
-								.trim().getBytes().length * 2 * 256);
-					}
-				}*/
+				/*
+				 * String[] datalistArray = datalist.get(i).split("\t"); arrSize
+				 * = datalistArray.length; for (int j = 0; j < arrSize; j++) {
+				 * HSSFCell cellj = row2.createCell(j);
+				 * cellj.setCellStyle(cellStyle);
+				 * cellj.setCellValue(datalistArray[j].toString().trim()); if
+				 * (("添加权限".equals(sec_operationType) ||
+				 * "删除权限".equals(sec_operationType) || "修改权限"
+				 * .equals(sec_operationType)) && j == 3) {
+				 * sheet.setColumnWidth(3, datalistArray[j].toString()
+				 * .trim().getBytes().length * 2 * 256); } }
+				 */
 				Map<String, Object> map = datalist.get(i);
 				HSSFCell cell00 = row2.createCell(0);
 				cell00.setCellStyle(cellStyle);
-				cell00.setCellValue(map.get("CREATED_DATE")==null?"":map.get("CREATED_DATE").toString());
-				
+				cell00.setCellValue(map.get("CREATED_DATE") == null ? "" : map
+						.get("CREATED_DATE").toString());
+
 				HSSFCell cell11 = row2.createCell(1);
 				cell11.setCellStyle(cellStyle);
-				cell11.setCellValue(map.get("USER_NAME")==null?"":map.get("USER_NAME").toString());
-				
+				cell11.setCellValue(map.get("USER_NAME") == null ? "" : map
+						.get("USER_NAME").toString());
+
 				HSSFCell cell22 = row2.createCell(2);
 				cell22.setCellStyle(cellStyle);
-				cell22.setCellValue(map.get("TYPE")==null?"":map.get("TYPE").toString());
-				
+				cell22.setCellValue(map.get("TYPE") == null ? "" : map.get(
+						"TYPE").toString());
+
 				HSSFCell cell33 = row2.createCell(3);
 				cell33.setCellStyle(cellStyle);
-				cell33.setCellValue(map.get("CONTEXT")==null?"":map.get("CONTEXT").toString());
-				
+				cell33.setCellValue(map.get("CONTEXT") == null ? "" : map.get(
+						"CONTEXT").toString());
+
 			}
-			/*if (arrSize > 0) {
-				sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, arrSize - 1));
-			}*/
+			/*
+			 * if (arrSize > 0) { sheet.addMergedRegion(new CellRangeAddress(0,
+			 * 0, 0, arrSize - 1)); }
+			 */
 			sheet.setDefaultColumnWidth(40);
 			// 输出Excel文件
 			response.reset();
