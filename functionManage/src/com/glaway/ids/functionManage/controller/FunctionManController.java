@@ -2112,7 +2112,7 @@ public class FunctionManController {
 		try {
 			List<String> tempList = new ArrayList<String>();
 			InputStreamReader isr = new InputStreamReader(new FileInputStream(
-					file), "GBK");
+					file), "UTF-8");
 			reader = new BufferedReader(isr);
 			String tempString = null;
 			// (针对po导出的文件部分数据一行数据中间null存在的情况)用户读取不到的问题
@@ -2290,9 +2290,8 @@ public class FunctionManController {
 	 * 定时任务，每天凌晨一点去查询P&O的文件数据放在全局变量里面 每天凌晨一点 0 0 1 * * ?
 	 */
 	// 测试： 每2分钟执行（由于P&O导出） 0 */2 * * * ?
-	// @Scheduled(cron = "0 */2 * * * ?"/* cron = "0 0 2 * * ?" */)
+	@Scheduled(cron = "0 0 2 * * ?")
 	public void getAllDataByScheduled() throws Exception {
-		System.out.println("定时任务2分钟执行----------------------");
 		// 所有数据
 		allLogFileData = new ArrayList<String>();
 		String filepath = CommonProperties.getStringProperty("logFilePath");
