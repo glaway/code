@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.glaway.ids.functionManage.service.UserCenterService;
 import com.glaway.ids.functionManage.util.*;
 import com.glaway.ids.functionManage.util.FileReader;
-import com.glaway.ids.functionManage.util.FileWriters;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,12 +26,10 @@ import org.apache.poi.hssf.util.HSSFColor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-
 import org.springframework.web.bind.annotation.*;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.glaway.ids.functionManage.dao.FunctionManDao;
@@ -2283,7 +2281,7 @@ public class FunctionManController {
      * 定时任务，每天凌晨一点去查询P&O的文件数据放在全局变量里面 每天凌晨一点 0 0 1 * * ?
      */
     // 测试： 每2分钟执行（由于P&O导出） 0 */2 * * * ?
-    // @Scheduled(cron = "0 */2 * * * ?"/* cron = "0 0 2 * * ?" */)
+    @Scheduled(cron = "0 0 2 * * ?")
     public void getAllDataByScheduled() throws Exception {
         System.out.println("定时任务2分钟执行----------------------");
         // 所有数据
