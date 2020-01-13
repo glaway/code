@@ -4,7 +4,6 @@ import com.glaway.ids.functionManage.properties.CommonProperties;
 
 import java.io.*;
 import java.io.BufferedReader;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
