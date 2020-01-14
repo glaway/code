@@ -238,9 +238,9 @@ public class FunctionManController {
                     .getStringProperty("testFilePath");
             String textName = "PO_query";
             String fileName = textPath + textName;
-
-            /*WSCallVpmServices wSCallVpmServices = new WSCallVpmServices();
-            wSCallVpmServices.callVpmServices("-export", fileName);*/
+            //导出最新的PO_query
+            WSCallVpmServices wSCallVpmServices = new WSCallVpmServices();
+            wSCallVpmServices.callVpmServices("-export", fileName);
 
             System.out.println(fileName);
             File queryFile = new File(fileName);
@@ -794,7 +794,7 @@ public class FunctionManController {
             String content = "*PERSON " + userId + ";" + organization + ";"
                     + firstName + ";" + lastName + ";" + phone + ";" + address
                     + ";" + email + ";" + user_level;
-            createVPMUserServices(userId, content, true);
+            createVPMUserServices(userId, content, false);
         } catch (Exception e) {
             message = "创建失败";
             e.printStackTrace();
@@ -2419,7 +2419,7 @@ public class FunctionManController {
                 String content = "*PERSON " + userId + ";" + orgId + ";"
                         + userName + ";" + "$" + ";" + "$" + ";" + "$"
                         + ";" + "$" + ";" + secret;
-                createVPMUserServices(userId, content, true);
+                createVPMUserServices(userId, content, false);
             }
         } catch (Exception e) {
             LOGGER.error("addUser error:::", e);
@@ -2458,9 +2458,9 @@ public class FunctionManController {
         fileWriter.writeLines(poContentList, true);
         WSCallVpmServices wSCallVpmServices = new WSCallVpmServices();
         //导入VPM系统
-        wSCallVpmServices.callVpmServices("", poCreateFileName);
+        /*wSCallVpmServices.callVpmServices("", poCreateFileName);
         // 创建系统用户
-        wSCallVpmServices.createUser(userId);
+        wSCallVpmServices.createUser(userId);*/
     }
 
     private List<String> addContentFromFirst(String content, List<String> poQueryContentList, String startWithStr) {

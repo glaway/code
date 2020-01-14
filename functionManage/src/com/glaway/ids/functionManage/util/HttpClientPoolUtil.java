@@ -90,7 +90,7 @@ public class HttpClientPoolUtil {
                 initPools();
             }
             method = (HttpEntityEnclosingRequestBase) getRequest(uri, "POST", "application/json;charset=UTF-8", 0, headerMap, cookie);
-            method.setEntity(new StringEntity(data));
+            method.setEntity(new StringEntity(data,"utf-8"));
             HttpContext context = HttpClientContext.create();
             CloseableHttpResponse httpResponse = httpClient.execute(method, context);
             httpEntity = httpResponse.getEntity();
