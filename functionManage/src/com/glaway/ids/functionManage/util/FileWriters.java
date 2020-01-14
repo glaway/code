@@ -59,14 +59,20 @@ public class FileWriters implements Serializable {
     }
 
     public <T> File writeLines(Collection<T> list, LineSeparator lineSeparator, boolean isAppend) throws RuntimeException {
-        PrintWriter writer = getPrintWriter(isAppend);
-        for (T t : list) {
-            if (null != t) {
-                writer.print(t.toString());
-                printNewLine(writer, lineSeparator);
-                writer.flush();
+        PrintWriter writer = null;
+        try{
+            writer = getPrintWriter(isAppend);
+            for (T t : list) {
+                if (null != t) {
+                    writer.print(t.toString());
+                    printNewLine(writer, lineSeparator);
+                    writer.flush();
+                }
             }
+        } finally {
+            this.close(writer);
         }
+
         return this.file;
     }
 
@@ -114,6 +120,16 @@ public class FileWriters implements Serializable {
             parentFile.mkdirs();
         }
         return parentFile;
+    }
+
+    public void close(Closeable closeable) {
+        if (null != closeable) {
+            try {
+                closeable.close();
+            } catch (Exception e) {
+                // 静默关闭
+            }
+        }
     }
 
 }

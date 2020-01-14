@@ -73,6 +73,12 @@ public class FunctionManController {
     public static List<Map<String, String>> alluserAndContextData = new ArrayList<Map<String, String>>();// 用户对应的上下文数据
     public static List<String> allLogFileData = new ArrayList<String>();// 日志数据
 
+    static {
+        Map<String, String> organizationData = new HashMap<String, String>();
+        organizationData.put("org_id", "132");
+        allorginaztionData.add(organizationData);
+    }
+
     private String logFileStr1;
 
     @RequestMapping("/login")
@@ -233,8 +239,8 @@ public class FunctionManController {
             String textName = "PO_query";
             String fileName = textPath + textName;
 
-            WSCallVpmServices wSCallVpmServices = new WSCallVpmServices();
-            wSCallVpmServices.callVpmServices("-export", fileName);
+            /*WSCallVpmServices wSCallVpmServices = new WSCallVpmServices();
+            wSCallVpmServices.callVpmServices("-export", fileName);*/
 
             System.out.println(fileName);
             File queryFile = new File(fileName);
@@ -788,7 +794,7 @@ public class FunctionManController {
             String content = "*PERSON " + userId + ";" + organization + ";"
                     + firstName + ";" + lastName + ";" + phone + ";" + address
                     + ";" + email + ";" + user_level;
-            createVPMUserServices(userId, content,false);
+            createVPMUserServices(userId, content, true);
         } catch (Exception e) {
             message = "创建失败";
             e.printStackTrace();
@@ -802,8 +808,7 @@ public class FunctionManController {
                 e.printStackTrace();
             }
             System.out.println("-----创建用户-----");
-            functionManDao.insertLog(DateUtil.getDateString(),
-                    userMap.get("userId").toString(), "用户创建", message);
+            functionManDao.insertLog(DateUtil.getDateString(), userMap.get("userId"), "用户创建", message);
         }
     }
 
@@ -937,7 +942,13 @@ public class FunctionManController {
         }
     }
 
-    // 写入文件
+    /**
+     * 写入文件
+     *
+     * @param fileName
+     * @param text
+     * @param type
+     */
     private void writeText(String fileName, String text, String type) {
         FileWriter fw = null;
         try {
@@ -2378,7 +2389,7 @@ public class FunctionManController {
                 return;
             }
             String userData = EncodeUtil.getEncoding(userDataJson);
-            if(StringUtils.isEmpty(userData)) {
+            if (StringUtils.isEmpty(userData)) {
                 setResult(resultMap, "500", "data charset is not contains {GB2312,ISO-8859-1,GBK,UTF-8}");
                 response.setContentType("text/html;charset=utf-8");
                 ResponseJsonUtils.json(response, resultMap);
@@ -2386,7 +2397,7 @@ public class FunctionManController {
             }
             Map userDataMap = JSON.parseObject(userData, Map.class);
             if (userDataMap == null || userDataMap.size() == 0) {
-                setResult(resultMap, "500",  "data is null!");
+                setResult(resultMap, "500", "data is null!");
                 response.setContentType("text/html;charset=utf-8");
                 ResponseJsonUtils.json(response, resultMap);
                 return;
@@ -2408,7 +2419,7 @@ public class FunctionManController {
                 String content = "*PERSON " + userId + ";" + orgId + ";"
                         + userName + ";" + "$" + ";" + "$" + ";" + "$"
                         + ";" + "$" + ";" + secret;
-                createVPMUserServices(userId, content,true);
+                createVPMUserServices(userId, content, true);
             }
         } catch (Exception e) {
             LOGGER.error("addUser error:::", e);
@@ -2423,34 +2434,41 @@ public class FunctionManController {
         ResponseJsonUtils.json(response, resultMap);
     }
 
-    private void createVPMUserServices(String userId, String content, boolean isBatch) throws Exception {
+    private void createVPMUserServices(String userId, String content, boolean appendPoQuery) throws Exception  {
         String textPath = CommonProperties.getStringProperty("testFilePath");
-        String textName = "PO_create";
-        String fileName = textPath + textName;
+        String poCreate = "PO_create";
+        String poCreateFileName = textPath + poCreate;
         // 创建
-        if(!isBatch) {
-            writeText(fileName, content, "import");
-        } else {
-            String copyFilePath = CommonProperties.getStringProperty("copyFilePath");
-            FileReader fileReader = new FileReader(copyFilePath);
-            List<String> poQueryContentList = fileReader.readLines(new ArrayList<String>());
-            List<String> newContentList = addContentFromFirst(content, poQueryContentList);
-            FileWriters fileWriter = new FileWriters(new File(fileName));
-            fileWriter.writeLines(newContentList,true);
+        String copyFilePath = CommonProperties.getStringProperty("copyFilePath");
+        FileReader fileReader = new FileReader(copyFilePath);
+        List<String> poContentList = fileReader.readLines(new ArrayList<String>());
+        poContentList.add(content);
+        if (appendPoQuery) {
+//            writeText(fileName, content, "import");
+            String poQuery = CommonProperties.getStringProperty("poQuery");
+            String startWith = CommonProperties.getStringProperty("startWith");
+            String poQueryFileName = textPath + poQuery;
+            FileReader poQueryReader = new FileReader(poQueryFileName);
+            List<String> poQueryContentList = poQueryReader.readLines(new ArrayList<String>());
+            poQueryContentList = addContentFromFirst(content, poQueryContentList, startWith);
+            FileWriters poQueryWriter = new FileWriters(new File(poQueryFileName));
+            poQueryWriter.writeLines(poQueryContentList, true);
         }
+        FileWriters fileWriter = new FileWriters(new File(poCreateFileName));
+        fileWriter.writeLines(poContentList, true);
         WSCallVpmServices wSCallVpmServices = new WSCallVpmServices();
         //导入VPM系统
-        wSCallVpmServices.callVpmServices("", fileName);
+        wSCallVpmServices.callVpmServices("", poCreateFileName);
         // 创建系统用户
         wSCallVpmServices.createUser(userId);
     }
 
-    private List<String> addContentFromFirst(String content, List<String> poQueryContentList) {
+    private List<String> addContentFromFirst(String content, List<String> poQueryContentList, String startWithStr) {
         List<String> newContentList = new ArrayList<String>();
         boolean flag = true;
-        for (int i = 0 ; i < poQueryContentList.size(); i++) {
+        for (int i = 0; i < poQueryContentList.size(); i++) {
             String queryContent = poQueryContentList.get(i);
-            if (flag && queryContent.startsWith("*PERSON")) {
+            if (flag && queryContent.startsWith(startWithStr)) {
                 newContentList.add(content);
                 newContentList.add(queryContent);
                 flag = false;
